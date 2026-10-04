@@ -1,0 +1,129 @@
+# DURYSTAP Geometry
+
+Kazakh-language geometry learning platform built with Next.js App Router, TypeScript, Tailwind CSS and Supabase. Includes Google login, administrator-managed course access, private lessons/PDFs, learning progress, optional sequential unlocking, and a simple admin editor.
+
+## Requirements and local development
+
+Use Node.js 24 LTS (minimum 22.18) and npm. Install the exact locked dependencies:
+
+```sh
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+PowerShell: use `Copy-Item .env.example .env.local` instead of `cp`. Fill in the configuration below and restart the server after environment changes. Open `http://localhost:3000`.
+
+Without configuration the landing page works, Google login is disabled, protected pages redirect to login, and private-media APIs fail closed. There are no seeded users, courses, or progress records. The landing curriculum is the requested static public course description, not database/demo enrollment data; maintain its copy when the actual course syllabus changes.
+
+## Environment variables
+
+Local development uses the same session and database permission checks as production. Sign in with Google using an active account with the required course access (or an administrator role).
+
+| Variable | Required for | Exposure |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Authentication and database access; project URL from Supabase | Public |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Authentication and database access; publishable key, never service role | Public |
+| `SUPABASE_SERVICE_ROLE_KEY` | Private PDFs and Supabase-hosted video signing | Server only |
+| `VIDEO_PROVIDER` | `supabase` (default) or `bunny`; unknown providers fail closed | Server only |
+| `VIDEO_PLAYBACK_TTL_SECONDS` | Optional integer 30–900; default 300 | Server only |
+| `BUNNY_STREAM_LIBRARY_ID` | Numeric library ID when using Bunny | Server only |
+| `BUNNY_STREAM_TOKEN_KEY` | Bunny Embed View Token Authentication key when using Bunny | Server only |
+
+Keep `.env.local` out of source control. Use your deployment provider's secret settings in production. Never prefix service/Bunny secrets with `NEXT_PUBLIC_`; the build rejects known privileged public credentials. Public variables are included during the build: rebuild when they change. Google client ID/secret belong in Supabase's provider settings, not this application's environment.
+
+## Supabase setup
+
+1. Create a project and copy its URL and publishable key into `.env.local`.
+2. Apply **all ten SQL files** in `supabase/migrations/` once, in filename order, using the Supabase SQL Editor as the database owner. For an existing project, apply only pending migrations after a backup. Do not skip migration `20261002001000_security_hardening.sql`.
+3. Keep `private` out of the Data API's exposed schemas. Check that RLS is enabled on application tables and that the `homework` and `course-media` buckets are private.
+4. Set the server-only service-role key for private-media signing. All authorization and ordinary database queries use the signed-in user's client and RLS. The privileged client only signs the lesson reference after authorization succeeds.
+
+For the Supabase CLI workflow, initialize local CLI configuration once with `supabase init`, then `supabase login`, `supabase link --project-ref YOUR_PROJECT_REF` and `supabase db push`. Choose either SQL Editor or tracked CLI migrations; reconcile migration history before switching workflows. The repository does not automatically migrate a hosted database at startup/build.
+
+See [database setup and policies](supabase/README.md) and the [security review](supabase/SECURITY_REVIEW.md).
+
+## Google OAuth configuration
+
+1. In Google Cloud, configure the OAuth consent screen and create an OAuth client of type **Web application**. During Google's testing mode, add your test accounts; complete the production publishing requirements before launch.
+2. Set its authorized redirect URI to `https://<project-ref>.supabase.co/auth/v1/callback` (or the exact callback shown by your Supabase project). This is the Google-to-Supabase callback.
+3. In Supabase Authentication → Providers, enable Google and save the Google client ID and secret. Enable only intended login providers; retain email verification for any additional provider.
+4. In Supabase Authentication → URL Configuration, set Site URL to your application's production HTTPS origin. Add the exact application callbacks: `http://localhost:3000/auth/callback` for local development and `https://YOUR_DOMAIN/auth/callback` for production. Avoid broad production wildcards.
+5. Restart/redeploy, then test actual Google login. The app exchanges the PKCE code at `/auth/callback` and routes to `/admin`, `/dashboard`, or `/access-denied` based on database permissions. No arbitrary return URL is accepted.
+
+Official references: [Google with Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google) and [redirect URL configuration](https://supabase.com/docs/guides/auth/redirect-urls).
+
+## First administrator
+
+Sign in once with your own Google account. Seeing the access-denied page initially is expected. Find that account's UUID in Supabase Authentication → Users, verify its email, and run this in the trusted SQL Editor:
+
+```sql
+update public.profiles
+set role = 'admin', is_active = true
+where id = 'YOUR_VERIFIED_AUTH_USER_UUID';
+```
+
+Sign out and back in. `/admin` checks the active admin role from the database. Signup metadata cannot create administrators; no public RPC promotes accounts.
+
+## Course and student setup
+
+- `/admin/courses`: create a course, modules and lessons. Set lesson descriptions, duration in seconds, protected video references, publication and optional sequential unlocking. Publish both the course and intended lessons.
+- Attach PDF homework in the lesson editor or `/admin/homework`; maximum 10 MiB. Uploads use an authenticated administrator and Storage RLS.
+- `/admin/students`: pre-authorize an email with **+ Оқушы қосу**, choosing a course. The verified matching account claims this administrator-issued invitation on sign-in.
+- For registered students, open their details to grant, renew or remove course access. Choose no expiry, 30/60/90 days or a custom inclusive Kazakhstan date. Deactivation blocks the whole account. Course grants do not reactivate an inactive account.
+- Students see only published assigned courses. Sequential courses require completing all earlier published lessons. Progress writes always use the authenticated user's ID.
+
+No-grant accounts see **Қолжетімділік жоқ** with their email and account-switch button. Expired/revoked grants block subsequent page, API and database requests without a scheduled job.
+
+## Private media
+
+For Supabase video, upload with trusted administrator tooling to private `course-media` and store `storage://course-media/<path>` in the lesson. Admin PDF upload creates its reference automatically. Public MP4 URLs are rejected. Students cannot sign/download Storage objects directly; the lesson APIs enforce access and return short-lived signed URLs capped by enrollment expiry.
+
+For Bunny, configure the library and token key, enable Embed View Token Authentication, and protect underlying CDN delivery before publishing. Store a video UUID or `bunny://UUID` in the editor. The player has native/Bunny playback-position handling and a resume prompt; verify the actual Bunny SDK and library in staging. Vimeo references are reserved but playback is not implemented.
+
+Signed links are bearer permissions until their original expiry, even after later revocation. Previously downloaded/buffered media cannot be recalled. Old links issued before migration 010 may last longer and require expiry or provider invalidation. This is access control, not DRM.
+
+See [video setup](supabase/VIDEO_SECURITY.md), [PDF setup](supabase/HOMEWORK.md), and [playback progress](supabase/PLAYBACK_PROGRESS.md).
+
+## Validation
+
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm start
+```
+
+Type checking generates Next route types first, so it works on a fresh checkout. Tests use Node's test runner and isolated PostgreSQL via PGlite; no test fixtures are inserted into your hosted database. Individual suites are available as `test:db`, `test:auth`, `test:video`, `test:homework`, `test:dashboard`, `test:editor`, `test:media`, and `test:security`.
+
+Read [production readiness results and the 18-scenario checklist](PRODUCTION_READINESS.md). Local tests do not substitute for hosted Google OAuth, cookie/session refresh, PostgREST, private downloads or real video playback. Finish the staging checklist with separate admin, authorized-student and unauthorized accounts before launch.
+
+## Production deployment
+
+Use a Next.js-capable host or a Node server. Static export is unsuitable: authentication, server actions and private media require a server. See [Next.js deployment options](https://nextjs.org/docs/app/getting-started/deploying).
+
+1. Configure the production Supabase project, pending migrations, Google provider and exact HTTPS redirects. Use a separate project for staging/testing.
+2. Set the public variables at build time and private secrets in the runtime environment. Keep the service-role key available only to the server.
+3. Install with `npm ci`, run the validation commands, and build with `npm run build`. On managed hosting select the Next.js preset. On a Node host run `npm start` under a process manager/container, with HTTPS terminated by a trusted reverse proxy.
+4. Preserve the original host/origin and cookies through the proxy; do not cache authenticated pages or `/api/lessons/*`. Keep Next's server-action origin checks enabled. Ensure the host supports the PDF action's 12 MB request limit; some hosts have smaller limits, so verify a representative upload before launch.
+5. Bootstrap the admin, add real course content, and run all staging scenarios. Check invalid/expired media links and direct ungranted URLs as well as the happy path. Configure database backups and monitor server/authentication failures without logging tokens or signed URLs.
+
+Missing credentials do not make the build fail: this supports previews, but a successful build alone does not mean production is configured. No deployment or hosted migration is performed automatically by this repository.
+
+## Structure
+
+```text
+src/app/(public)/            Landing page
+src/app/(auth)/              Login and access-denied pages
+src/app/(student)/dashboard/ Student courses, lessons, progress and profile
+src/app/(admin)/admin/       Student/access management and course editor
+src/app/auth/               OAuth callback and logout
+src/app/api/lessons/         Protected video, PDF and playback endpoints
+src/components/             Shared UI, navigation, student/admin components
+src/lib/                    Authorization, queries, providers and validation
+supabase/migrations/        Schema, indexes, functions and RLS
+scripts/                    Isolated regression tests
+```
+
+The application intentionally excludes payments, complex analytics and a general-purpose CMS.
