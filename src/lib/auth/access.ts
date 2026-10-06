@@ -1,5 +1,19 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
+export const OWNER_EMAIL = "qazbek03@gmail.com";
+
+function isGoogleOwner(user: User) {
+  return (
+    user.email?.trim().toLowerCase() === OWNER_EMAIL &&
+    user.identities?.some(
+      (identity) =>
+        identity.provider === "google" &&
+        identity.identity_data?.email?.trim().toLowerCase() === OWNER_EMAIL &&
+        identity.identity_data?.email_verified === true,
+    )
+  );
+}
+
 export type AccountAccess =
   | { status: "signed-out" }
   | { status: "denied"; user: User }
@@ -18,6 +32,13 @@ export async function getAccountAccess(
   const denied: AccountAccess = { status: "denied", user };
   if (!user.email?.trim() || !user.email_confirmed_at) return denied;
 
+  // This RPC accepts no user/email arguments and verifies the Google identity
+  // again inside Postgres. It cannot promote anyone except the fixed owner.
+  if (isGoogleOwner(user)) {
+    const { error: ownerError } = await supabase.rpc("claim_owner_admin");
+    if (ownerError) return denied;
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("email, role, is_active")
@@ -29,7 +50,8 @@ export async function getAccountAccess(
     profile.email?.trim().toLowerCase() !== user.email.trim().toLowerCase()
   )
     return denied;
-  if (profile.role === "admin") return { status: "admin", user };
+  if (profile.role === "admin")
+    return isGoogleOwner(user) ? { status: "admin", user } : denied;
   if (profile.role !== "student") return denied;
 
   // The database claims only this verified identity's single-use invitations.

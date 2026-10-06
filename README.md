@@ -35,7 +35,7 @@ Keep `.env.local` out of source control. Use your deployment provider's secret s
 ## Supabase setup
 
 1. Create a project and copy its URL and publishable key into `.env.local`.
-2. Apply **all ten SQL files** in `supabase/migrations/` once, in filename order, using the Supabase SQL Editor as the database owner. For an existing project, apply only pending migrations after a backup. Do not skip migration `20261002001000_security_hardening.sql`.
+2. Apply **all SQL files** in `supabase/migrations/` once, in filename order, using the Supabase SQL Editor as the database owner. For an existing project, apply only pending migrations after a backup. Include `20261002001000_security_hardening.sql` and `20261004001100_single_google_admin.sql`.
 3. Keep `private` out of the Data API's exposed schemas. Check that RLS is enabled on application tables and that the `homework` and `course-media` buckets are private.
 4. Set the server-only service-role key for private-media signing. All authorization and ordinary database queries use the signed-in user's client and RLS. The privileged client only signs the lesson reference after authorization succeeds.
 
@@ -45,25 +45,21 @@ See [database setup and policies](supabase/README.md) and the [security review](
 
 ## Google OAuth configuration
 
-1. In Google Cloud, configure the OAuth consent screen and create an OAuth client of type **Web application**. During Google's testing mode, add your test accounts; complete the production publishing requirements before launch.
+1. In Google Cloud, configure the OAuth consent screen and create an OAuth client of type **Web application**. This app uses only basic identity scopes (email/profile); Google exempts these sign-in requests from the Testing-mode test-user allowlist and seven-day authorization expiry. If additional scopes are introduced, review Google's testing and verification requirements before enabling them. Complete production branding and domain configuration before launch.
 2. Set its authorized redirect URI to `https://<project-ref>.supabase.co/auth/v1/callback` (or the exact callback shown by your Supabase project). This is the Google-to-Supabase callback.
-3. In Supabase Authentication → Providers, enable Google and save the Google client ID and secret. Enable only intended login providers; retain email verification for any additional provider.
+3. In Supabase Authentication → Providers, enable Google and save the Google client ID and secret. Keep other login providers, anonymous sign-in and manual identity linking disabled. Google client secrets must stay in Supabase, never in browser code.
 4. In Supabase Authentication → URL Configuration, set Site URL to your application's production HTTPS origin. Add the exact application callbacks: `http://localhost:3000/auth/callback` for local development and `https://YOUR_DOMAIN/auth/callback` for production. Avoid broad production wildcards.
 5. Restart/redeploy, then test actual Google login. The app exchanges the PKCE code at `/auth/callback` and routes to `/admin`, `/dashboard`, or `/access-denied` based on database permissions. No arbitrary return URL is accepted.
 
-Official references: [Google with Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google) and [redirect URL configuration](https://supabase.com/docs/guides/auth/redirect-urls).
+Official references: [Google with Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google), [redirect URL configuration](https://supabase.com/docs/guides/auth/redirect-urls), and [Google app audience and basic identity scope exception](https://support.google.com/cloud/answer/15549945?hl=en).
 
-## First administrator
+## Sole administrator
 
-Sign in once with your own Google account. Seeing the access-denied page initially is expected. Find that account's UUID in Supabase Authentication → Users, verify its email, and run this in the trusted SQL Editor:
+The only administrator is **qazbek03@gmail.com**. After applying migration `20261004001100_single_google_admin.sql`, sign in with that Google account. The server calls the argument-free `claim_owner_admin()` RPC, which verifies the current Auth user's confirmed email and verified Google identity inside the database before assigning the role. The account then opens `/admin` without needing a course grant.
 
-```sql
-update public.profiles
-set role = 'admin', is_active = true
-where id = 'YOUR_VERIFIED_AUTH_USER_UUID';
-```
+No manual UUID update or service-role key is required for administrator login. The migration demotes previous administrators with other identities. Database policies and a profile trigger prevent other accounts from becoming administrators, including via direct API calls. Inactive accounts remain inactive. The email in browser input or user metadata cannot grant access. Other users are students and still need administrator-issued course access.
 
-Sign out and back in. `/admin` checks the active admin role from the database. Signup metadata cannot create administrators; no public RPC promotes accounts.
+If Google login is disabled, fill `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local`, then restart the development server (or rebuild the deployment). If Google refuses the redirect, check both callback URLs in the configuration above. If the owner sees access denied, verify migration 011 was applied and the profile is active. If the callback fails locally, also check that the server process can reach Supabase over HTTPS.
 
 ## Course and student setup
 

@@ -54,6 +54,7 @@ try {
     grant usage on schema storage to authenticated;
     grant select,insert,update,delete on storage.objects to authenticated;
     create table auth.users (id uuid primary key, email text, email_confirmed_at timestamptz, raw_user_meta_data jsonb default '{}'::jsonb);
+    create table auth.identities (user_id uuid references auth.users(id), provider text, identity_data jsonb);
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
     grant usage on schema public, auth to anon, authenticated, service_role;
@@ -64,6 +65,11 @@ try {
   for (const file of (await readdir(migrations))
     .filter((f) => f.endsWith(".sql"))
     .sort()) {
+    if (file === "20261004001100_single_google_admin.sql") {
+      await db.exec(
+        `update public.profiles set role='admin' where id='${legacy}'`,
+      );
+    }
     await db.exec(await readFile(new URL(file, migrations), "utf8"));
   }
   await eq(
@@ -72,7 +78,7 @@ try {
     "existing users backfilled",
   );
   await db.exec(`insert into auth.users(id,email,raw_user_meta_data) values
-    ('${admin}','admin@example.test','{}'),
+    ('${admin}','qazbek03@gmail.com','{}'),
     ('${student}','student@example.test','{"role":"admin","is_active":false,"full_name":"Student"}'),
     ('${other}','other@example.test','{}');`);
   await eq(
@@ -86,7 +92,9 @@ try {
     "metadata cannot change activity",
   );
   await db.exec(
-    `update public.profiles set role='admin' where id='${admin}'; update auth.users set email='changed@example.test' where id='${student}';`,
+    `update auth.users set email_confirmed_at=now() where id='${admin}';
+     insert into auth.identities values ('${admin}', 'google', '{"email":"qazbek03@gmail.com","email_verified":true}');
+     update public.profiles set role='admin' where id='${admin}'; update auth.users set email='changed@example.test' where id='${student}';`,
   );
   await eq(
     `select email from public.profiles where id='${student}'`,
@@ -1255,7 +1263,7 @@ try {
     "profile email mismatch denied by RLS",
   );
   await asOwner();
-  await db.exec(`update public.profiles set email='security@example.test',role='admin' where id='${securityUser}';
+  await db.exec(`update public.profiles set email='security@example.test' where id='${securityUser}';
     update auth.users set email_confirmed_at=null where id='${securityUser}'`);
   await asUser(securityUser);
   await denied(
@@ -1277,14 +1285,86 @@ try {
     "restrictive guard prevents permissive policy signing bypass",
   );
   await asOwner();
-  await db.exec(
+  await denied(
     `update public.profiles set role='admin' where id='${securityUser}'`,
+    "even direct database writes cannot appoint another admin",
   );
-  await asUser(securityUser);
+  await db.exec(
+    `update public.profiles set is_active=true where id='${admin}'`,
+  );
+  await asUser(admin);
   await eq(
     `select count(*)::int > 0 from storage.objects where bucket_id='homework'`,
     true,
     "verified administrator retains Storage management",
+  );
+  await denied(
+    `update public.profiles set role='admin' where id='${student}'`,
+    "owner cannot appoint another admin",
+  );
+  await asUser(student);
+  await denied(
+    "select public.claim_owner_admin()",
+    "student cannot claim owner privileges",
+  );
+  await asOwner();
+  await db.exec(
+    `update public.profiles set role='student' where id='${admin}'`,
+  );
+  await asUser(admin);
+  await db.exec("select public.claim_owner_admin()");
+  await eq(
+    "select private.is_admin()",
+    true,
+    "Google owner claims admin without enrollment",
+  );
+  await asOwner();
+  await db.exec(
+    `update public.profiles set role='student', is_active=false where id='${admin}'`,
+  );
+  await asUser(admin);
+  await db.exec("select public.claim_owner_admin()");
+  await eq(
+    "select private.is_admin()",
+    false,
+    "claim never reactivates disabled owner",
+  );
+  await asOwner();
+  await db.exec(`update public.profiles set is_active=true where id='${admin}';
+    update auth.identities set provider='email' where user_id='${admin}'`);
+  await asUser(admin);
+  await denied(
+    "select public.claim_owner_admin()",
+    "matching email without Google is insufficient",
+  );
+  await asOwner();
+  await db.exec(
+    `update auth.identities set provider='google', identity_data='{"email":"qazbek03@gmail.com","email_verified":false}' where user_id='${admin}'`,
+  );
+  await asUser(admin);
+  await denied(
+    "select public.claim_owner_admin()",
+    "unverified Google identity denied",
+  );
+  await asOwner();
+  await db.exec(
+    `update auth.identities set identity_data='{"email":"qazbek03@gmail.com","email_verified":true}' where user_id='${admin}'`,
+  );
+  await asUser(admin);
+  await db.exec("select public.claim_owner_admin()");
+  await asOwner();
+  await db.exec(`delete from auth.identities where user_id='${admin}'`);
+  await asUser(admin);
+  await eq(
+    "select private.is_admin()",
+    false,
+    "removing Google identity revokes admin despite stored role",
+  );
+  await asOwner();
+  await db.exec("set role anon");
+  await denied(
+    "select public.claim_owner_admin()",
+    "anonymous cannot claim owner privileges",
   );
   console.log(`Database migration and ${checks} security checks passed.`);
 } finally {

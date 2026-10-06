@@ -10,6 +10,17 @@ const user = {
   app_metadata: { role: "admin" },
 };
 const profile = { email: user.email, role: "student", is_active: true };
+const owner = {
+  ...user,
+  email: "qazbek03@gmail.com",
+  identities: [
+    {
+      provider: "google",
+      identity_data: { email: "qazbek03@gmail.com", email_verified: true },
+    },
+  ],
+};
+const ownerProfile = { ...profile, email: owner.email, role: "admin" };
 function client({
   identity = user,
   profileRow = profile,
@@ -18,9 +29,11 @@ function client({
   profileError = null,
   grantError = null,
   invitationError = null,
+  ownerError = null,
 } = {}) {
   return {
     rpc: async (name) => {
+      if (name === "claim_owner_admin") return { error: ownerError };
       assert.equal(name, "claim_student_invitations");
       return { error: invitationError };
     },
@@ -141,9 +154,49 @@ for (const [name, options, status] of [
     "student",
   ],
   [
-    "database admin without enrollment",
+    "a different database admin is denied",
     { profileRow: { ...profile, role: "admin" } },
+    "denied",
+  ],
+  [
+    "verified Google owner without enrollment",
+    { identity: owner, profileRow: ownerProfile },
     "admin",
+  ],
+  [
+    "owner email alone is insufficient",
+    { identity: { ...owner, identities: [] }, profileRow: ownerProfile },
+    "denied",
+  ],
+  [
+    "unverified Google identity is insufficient",
+    {
+      identity: {
+        ...owner,
+        identities: [
+          {
+            provider: "google",
+            identity_data: { email: owner.email, email_verified: false },
+          },
+        ],
+      },
+      profileRow: ownerProfile,
+    },
+    "denied",
+  ],
+  [
+    "owner claim failure closes access",
+    {
+      identity: owner,
+      profileRow: ownerProfile,
+      ownerError: new Error("migration missing"),
+    },
+    "denied",
+  ],
+  [
+    "inactive owner stays denied",
+    { identity: owner, profileRow: { ...ownerProfile, is_active: false } },
+    "denied",
   ],
   [
     "inactive admin",

@@ -48,7 +48,7 @@ export function GoogleLoginButton({ configured }: { configured: boolean }) {
       </Button>
       {!configured && (
         <p className="mt-4 text-sm leading-6 text-muted">
-          Кіру қызметі жақында қолжетімді болады.
+          Google арқылы кіру әлі бапталмаған. Әкімшіге хабарласыңыз.
         </p>
       )}
       {error && (

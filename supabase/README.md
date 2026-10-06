@@ -17,23 +17,17 @@ Choose one workflow; do not run the same migration again through the other workf
 
 Keep the `private` schema out of Supabase's exposed API schemas. Application tables belong in `public` with RLS enabled. Configure `.env.local` using the root README. Private media signing requires a server-only SUPABASE_SERVICE_ROLE_KEY. Application queries and authorization still use the cookie-scoped client and RLS. Apply migration 010 and see [security review](SECURITY_REVIEW.md).
 
-## First administrator
+## Sole administrator
 
-Sign in with Google once, then find your UUID in Supabase Authentication → Users. Run this through the trusted SQL Editor, substituting that exact UUID:
+Apply `20261004001100_single_google_admin.sql`, then sign in with **qazbek03@gmail.com** through Google. The server calls `claim_owner_admin()` with no arguments. Only the currently authenticated owner with a confirmed Auth email and a matching verified Google identity can claim this role. The RPC never reactivates an inactive profile. Other accounts cannot appoint themselves or another user.
 
-```sql
-update public.profiles
-set role = 'admin', is_active = true
-where id = 'YOUR_AUTH_USER_UUID';
-```
-
-New and existing Auth users default to `student`. Signup metadata cannot set the role or activity status. The trigger copies only name/avatar and synchronizes Auth email changes. `profiles.role` is the authoritative role; JWT `app_metadata` is not used for permissions. No RPC grants admin privileges. The invitation-claim RPC can only consume existing administrator-issued authorizations for the current user's verified email.
+The migration demotes former administrators outside the owner identity. RLS checks both the database role and the verified owner identity on every request. A profile trigger also rejects attempts to give another account the admin role. New Auth users default to `student`; signup metadata cannot set roles. The invitation-claim RPC remains limited to existing administrator-issued course authorizations.
 
 ## Access rules
 
 | Entity          | Student                                                                                | Active administrator                                                |
 | --------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| profiles        | Read own profile, including inactive status; no writes                                 | Read and update profiles, roles and activity                        |
+| profiles        | Read own profile, including inactive status; no writes                                 | Read profiles and update activity; cannot appoint another admin     |
 | courses         | Read published courses with active, unexpired access                                   | Create, read, update, delete                                        |
 | modules         | Read only inside an accessible published course                                        | Create, read, update, delete                                        |
 | lessons         | Read published lessons inside an accessible published course                           | Create, read, update, delete                                        |
