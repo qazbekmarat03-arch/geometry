@@ -46,7 +46,7 @@ export default async function CoursesPage({
         <div className="course-gallery">
           {data.map((course) => (
             <Card key={course.id} className="course-tile !p-0">
-              <div className="course-art relative overflow-hidden rounded-[20px] bg-[#e5eadb] p-8">
+              <div className="course-art relative overflow-hidden rounded-[20px] bg-[#123b2d] p-8">
                 <CourseArtwork className="mx-auto h-48 w-full" />
                 <span className="absolute bottom-5 left-6 text-[9px] tracking-[.2em] text-muted">
                   DURYSTAP / GEOMETRY

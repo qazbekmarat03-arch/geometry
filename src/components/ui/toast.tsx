@@ -37,13 +37,13 @@ function ToastItem({
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-line bg-white p-4 text-ink shadow-xl"
+      className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-ink shadow-xl"
     >
       <Icon
         size={20}
         className={
           item.error
-            ? "mt-0.5 shrink-0 text-red-700"
+            ? "mt-0.5 shrink-0 text-red-300"
             : "mt-0.5 shrink-0 text-brand"
         }
         aria-hidden="true"

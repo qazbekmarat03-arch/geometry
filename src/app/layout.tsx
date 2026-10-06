@@ -3,10 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 const displayFont = localFont({
-  src: "../../public/fonts/manrope-variable.ttf",
-  variable: "--font-manrope",
+  src: "../../public/fonts/noto-sans-variable.ttf",
+  variable: "--font-heading",
   display: "swap",
-  weight: "200 800",
+  weight: "100 900",
 });
 const bodyFont = localFont({
   src: "../../public/fonts/inter-variable.ttf",

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { BrandMark } from "@/components/layout/brand-mark";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -51,7 +52,7 @@ function Brand() {
   return (
     <a href="#top" className="gm-brand" aria-label="DURYSTAP">
       <span className="gm-brand-mark">
-        <Layers3 size={23} strokeWidth={1.5} />
+        <BrandMark />
       </span>
       <span className="gm-brand-durys">DURYS</span>
       <span className="gm-brand-tap">TAP</span>

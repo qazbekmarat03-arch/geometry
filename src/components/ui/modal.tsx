@@ -37,7 +37,7 @@ export function Modal({
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
-      className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto overscroll-contain rounded-[28px] border border-white bg-[#fcfdf9] p-0 text-ink shadow-[0_32px_100px_-20px_#10221860] backdrop:bg-[#102218]/40 backdrop:backdrop-blur-md"
+      className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto overscroll-contain rounded-[28px] border border-line bg-surface p-0 text-ink shadow-[0_32px_100px_-20px_#10221860] backdrop:bg-[#102218]/40 backdrop:backdrop-blur-md"
     >
       <div className="p-7 sm:p-9">
         <div className="mb-5 flex items-center justify-between gap-4">

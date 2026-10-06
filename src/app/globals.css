@@ -1,20 +1,20 @@
 @import "tailwindcss";
 @import "./interior.css";
 @theme inline {
-  --color-brand: #125d40;
-  --color-brand-dark: #102d24;
-  --color-brand-light: #edf2e7;
-  --color-ink: #17231e;
-  --color-muted: #657169;
-  --color-line: #e0e4dc;
-  --color-surface: #f5f6f1;
-  --color-lime: #d5eab5;
+  --color-brand: #2ee59d;
+  --color-brand-dark: #0b2a1f;
+  --color-brand-light: #123b2d;
+  --color-ink: #ecf7f0;
+  --color-muted: #a6beb0;
+  --color-line: #24483a;
+  --color-surface: #0d241b;
+  --color-lime: #c6ff4d;
   --font-sans: var(--font-inter), sans-serif;
-  --font-display: var(--font-manrope), sans-serif;
+  --font-display: var(--font-heading), sans-serif;
   --shadow-card: 0 4px 8px -6px #18271a0a, 0 18px 50px -26px #18271a20;
 }
 :root {
-  --paper: #f8f9f4;
+  --paper: #06130e;
   --radius-panel: 28px;
   --radius-control: 12px;
   --space-section: clamp(80px, 10vw, 156px);
@@ -127,13 +127,13 @@ summary::-webkit-details-marker {
     0 6px 16px #102d2420;
 }
 .button-secondary {
-  background: #ffffffb0;
+  background: #123327;
   border: 1px solid var(--color-line);
   color: var(--color-ink);
   box-shadow: 0 2px 3px #102d2403;
 }
 .button-secondary:hover {
-  background: #fff;
+  background: #102c21;
   border-color: #becbc0;
 }
 .button-ghost {
@@ -141,11 +141,11 @@ summary::-webkit-details-marker {
 }
 .button-ghost:hover {
   color: var(--color-ink);
-  background: #edf0e9;
+  background: #17432f;
 }
 .premium-card {
   border-radius: var(--radius-panel);
-  border: 1px solid #e1e6de;
+  border: 1px solid var(--color-line);
   background: #fff;
   box-shadow: var(--shadow-card);
 }
@@ -428,7 +428,7 @@ summary::-webkit-details-marker {
   border-collapse: collapse;
 }
 .workspace-main thead {
-  background: #f9faf7;
+  background: #10291f;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -440,7 +440,7 @@ summary::-webkit-details-marker {
   transition: background 0.2s;
 }
 .workspace-main tbody tr:hover {
-  background: #f8faf4;
+  background: #153b2b;
 }
 .workspace-main td,
 .workspace-main th {
@@ -451,8 +451,8 @@ summary::-webkit-details-marker {
   input:not([type="checkbox"]):not([type="hidden"]):not([type="file"]),
 .workspace-main select,
 .workspace-main textarea {
-  background: #fafbf8;
-  border-color: #dfe5d9;
+  background: #0a1e16;
+  border-color: var(--color-line);
   border-radius: 12px;
 }
 .workspace-main input:focus,
@@ -510,8 +510,8 @@ summary::-webkit-details-marker {
   pointer-events: none;
 }
 .course-art {
-  background: #e7ecdf;
-  color: #44694e;
+  background: #123b2d;
+  color: #79eab6;
 }
 .course-tile {
   transition:
@@ -531,7 +531,7 @@ summary::-webkit-details-marker {
 .auth-page {
   position: relative;
   background:
-    radial-gradient(ellipse at 20% 80%, #e4eddc, transparent 60%), var(--paper);
+    radial-gradient(ellipse at 20% 80%, #164d34, transparent 60%), var(--paper);
 }
 .auth-art {
   background: #152b22;
@@ -548,8 +548,8 @@ summary::-webkit-details-marker {
   opacity: 0.65;
 }
 .empty-installation {
-  background: linear-gradient(130deg, #fff, #f7f9f2);
-  border: 1px solid #e0e6d9;
+  background: linear-gradient(130deg, #102c21, #091c14);
+  border: 1px solid var(--color-line);
   border-radius: 28px;
   padding: 60px 30px;
   position: relative;
@@ -729,4 +729,54 @@ summary::-webkit-details-marker {
 
 .problem-section .section-eyebrow {
   color: #abbcaf;
+}
+/* Shared brand and product design tokens. */
+.brand-mark { display: inline-block; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px; background-image: url('/images/durystap-brand.png'); background-size: 1129.412% 752.941%; background-position: 3.42857% 83.78378%; }
+body { color-scheme: dark; }
+.button-primary { background: #c6ff4d; color: #102018; border-color: #c6ff4d; box-shadow: 0 4px 24px #c6ff4d14; }
+.button-primary:hover { background: #d7ff87; box-shadow: 0 6px 28px #c6ff4d25; }
+.button-secondary:hover { background: #1b4833; border-color: #3d7758; }
+:focus-visible { outline-color: #a7f3d0; }
+.auth-art { background: radial-gradient(ellipse at 60% 50%, #16693f60, transparent 65%), #0b2a1f; border: 1px solid #2ee59d30; }
+.auth-page h1 { font-weight: 650; letter-spacing: -.035em; }
+.workspace { background: radial-gradient(ellipse at 85% 0%, #13633624, transparent 45%), #06130e; }
+.workspace .workspace-sidebar { background: #081b13 !important; border-right: 1px solid #1e3b2e !important; }
+.workspace .workspace-sidebar nav a { padding-inline: 16px; border: 1px solid transparent; border-radius: 14px !important; }
+.workspace .workspace-sidebar nav a[aria-current="page"] { border-color: #2ee59d30; box-shadow: inset 0 1px 0 #ffffff08 !important; }
+.workspace .workspace-sidebar nav a[aria-current="page"]::before { display: none; }
+.workspace .workspace-header { border-bottom: 1px solid #ffffff08; }
+.workspace .workspace-main { background: radial-gradient(ellipse at 100% 0%, #13533524, transparent 50%), #06130e; border-color: #204333; }
+.workspace .workspace-main h1 { font-weight: 650; }
+.workspace .workspace-main h2 { font-weight: 600; }
+.workspace .premium-card, .admin-metric { border-color: #24483a; box-shadow: inset 0 1px 0 #ffffff05, 0 20px 50px -35px #000; }
+.admin-metric:first-child { background: radial-gradient(ellipse at bottom right, #19774950, transparent 70%), #103725; }
+.admin-metric-number, .progress-number { color: #a7f3d0; font-variant-numeric: tabular-nums; }
+.workspace .continue-panel { background: radial-gradient(ellipse at right, #16815450, transparent 65%), #0b2a1f; border: 1px solid #2ee59d30; border-radius: 28px; }
+.workspace .course-tile { border: 1px solid #24483a; background: #0d261c; border-radius: 24px; overflow: hidden; padding: 16px; }
+.workspace .course-gallery { gap: 24px; grid-template-columns: repeat(2,minmax(0,1fr)); }
+.workspace .course-gallery .course-tile:nth-child(even) { margin-top: 0; }
+.workspace .course-tile-info { padding-inline: 8px; }
+.workspace .course-tile-footer .premium-button { color: #a7f3d0; }
+.workspace .editorial-table { border: 1px solid #24483a; border-radius: 24px; background: #0b2118; }
+.workspace .editorial-table thead { background: #102d21; }
+.workspace .editorial-table thead th { font-size: 11px; }
+.workspace .empty-installation { border: 1px solid #24483a; border-radius: 28px; background: radial-gradient(ellipse at right, #165e3538, transparent 65%), #0b2118; }
+.workspace .editor-module, .workspace .access-row { border-radius: 20px; border: 1px solid #24483a; background: #0a2017; padding: 24px; margin-block: 16px; }
+.workspace .editor-tools .premium-button { font-size: 12px; min-height: 40px; }
+.workspace :is(input:not([type='checkbox']):not([type='hidden']),textarea,select), dialog :is(input,textarea,select) { background: #081d14; color: #ecf7f0; border-color: #315642; }
+.workspace :is(.bg-white,.bg-white\/80,.bg-white\/70) { background: #102d21; }
+.workspace :is(.text-red-700,.text-red-600), dialog .text-red-700 { color: #fda4af; }
+.workspace :is(.bg-red-50,.bg-red-100) { background: #451f28; }
+.workspace :is(.text-green-700,.text-emerald-700) { color: #86efac; }
+.workspace :is(.bg-green-50,.bg-emerald-50) { background: #123b2d; }
+.workspace .text-amber-800 { color: #fde68a; }
+.workspace .bg-amber-50 { background: #3f311a; }
+.workspace .pdf-sheet { color: #b5f5ce; }
+@media (max-width:767px) {
+ .workspace .course-gallery { grid-template-columns: 1fr; }
+ .workspace .empty-installation { padding: 30px 24px; }
+ .workspace .editor-module,.workspace .access-row { padding: 18px; }
+ .workspace .editorial-table tbody tr { padding-inline: 18px; }
+ .workspace .workspace-main h1 { font-size: clamp(28px,7vw,36px); }
+ .workspace .workspace-sidebar { position: sticky; top: 0; z-index: 30; background: #081b13f2 !important; backdrop-filter: blur(16px); }
 }

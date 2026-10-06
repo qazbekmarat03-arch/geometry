@@ -51,7 +51,7 @@ export default async function LessonEditor({
         <Card className="!border-0 !bg-transparent !p-0 !shadow-none">
           <ContentForm kind="lesson" values={lesson} />
         </Card>
-        <Card className="self-start !bg-[#ecefe4] !shadow-none">
+        <Card className="self-start !bg-[#102d21] !shadow-none">
           <h2 className="mb-5 text-xl font-semibold">Үй тапсырмасы</h2>
           {lesson.homework_pdf_url && (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

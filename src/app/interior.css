@@ -1,9 +1,9 @@
 /* Authenticated product surfaces; landing styles remain independent. */
 .workspace {
-  --surface-base: #f4f5ef;
-  --surface-raised: #fdfdf9;
-  --surface-inset: #eceee5;
-  --border-fine: #dce1d5;
+  --surface-base: #06130e;
+  --surface-raised: #0d261c;
+  --surface-inset: #091c14;
+  --border-fine: #24483a;
   --title-size: clamp(2.2rem, 3.7vw, 3.6rem);
   --space-panel: clamp(24px, 3vw, 44px);
   --radius-workspace: 22px;
@@ -11,7 +11,7 @@
   background: var(--surface-base);
 }
 .workspace .workspace-sidebar {
-  width: 220px !important;
+  width: 256px !important;
   border: 0 !important;
   background: transparent !important;
   padding: 0 8px;
@@ -20,15 +20,15 @@
   position: relative;
   border-radius: 9px !important;
   min-height: 46px;
-  font-size: 12px;
+  font-size: 14px;
   transition:
     background 0.2s,
     color 0.2s,
     transform 0.2s;
 }
 .workspace .workspace-sidebar nav a[aria-current="page"] {
-  background: #e3e9db !important;
-  color: #193d2a !important;
+  background: #123b2d !important;
+  color: #8ff1c0 !important;
   box-shadow: none !important;
 }
 .workspace .workspace-sidebar nav a[aria-current="page"]::before {
@@ -39,7 +39,7 @@
   bottom: 12px;
   width: 3px;
   border-radius: 3px;
-  background: #406a47;
+  background: #2ee59d;
 }
 .workspace .workspace-sidebar nav a:hover {
   transform: translateX(2px);
@@ -60,8 +60,8 @@
 }
 .workspace .workspace-main h1 {
   font-size: var(--title-size);
-  font-weight: 500;
-  letter-spacing: -0.055em;
+  font-weight: 600;
+  letter-spacing: -0.04em;
   line-height: 1.12;
 }
 .workspace .workspace-main h2 {
@@ -88,7 +88,7 @@
   border: 0;
   border-top: 1px solid var(--border-fine);
   border-radius: 0;
-  background: radial-gradient(ellipse at 70% 40%, #e3e9d8aa, transparent 52%);
+  background: radial-gradient(ellipse at 70% 40%, #1c63403d, transparent 52%);
   min-height: 340px;
   text-align: left;
   align-items: flex-start;
@@ -211,7 +211,7 @@
   position: relative;
   padding: 30px;
   background: var(--surface-raised);
-  border: 1px solid #e1e5da;
+  border: 1px solid #24483a;
   border-radius: 20px;
   overflow: hidden;
   transition: transform 0.2s;
@@ -221,7 +221,7 @@
 }
 .admin-metric:first-child {
   grid-row: span 2;
-  background: #e7ecde;
+  background: #123b2d;
   min-height: 300px;
   display: flex;
   flex-direction: column;
@@ -239,7 +239,7 @@
   padding: 22px 12px 0;
 }
 .admin-metric:nth-child(3) {
-  background: #fbfbf7;
+  background: #0d261c;
 }
 .admin-metric-number {
   font-family: var(--font-display);
@@ -286,7 +286,7 @@
   font-weight: 500;
 }
 .workspace .editorial-table tbody tr:hover {
-  background: #ffffff80;
+  background: #16433180;
 }
 .identity-mark {
   display: inline-flex;
@@ -294,12 +294,12 @@
   height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d7ddcf;
+  border: 1px solid #285541;
   border-radius: 50%;
   font-family: var(--font-display);
   font-size: 16px;
-  color: #49604d;
-  background: #edf0e7;
+  color: #8ff1c0;
+  background: #143b2a;
   flex-shrink: 0;
 }
 .editorial-table .student-name {
@@ -412,14 +412,14 @@
   transition: background 0.2s;
 }
 .lesson-row[aria-current="page"] {
-  background: #e4ebdc;
-  color: #25432e;
+  background: #173e2e;
+  color: #a7f3d0;
 }
 .lesson-row:hover {
-  background: #e9ede3;
+  background: #102d21;
 }
 .lesson-row[aria-disabled] {
-  color: #889180;
+  color: #97aea1;
 }
 .lesson-layout .lesson-frame {
   border-radius: 20px;
@@ -437,7 +437,7 @@
 }
 .workspace .homework-document {
   border: 0;
-  background: #edefe6;
+  background: #102f22;
   border-radius: 18px;
   padding: 32px 32px 32px 132px;
   min-height: 200px;
@@ -449,8 +449,8 @@
   top: 32px;
   width: 80px;
   height: 108px;
-  background: #fffef8;
-  border: 1px solid #dce0d4;
+  background: #164b33;
+  border: 1px solid #357454;
   border-radius: 3px 18px 3px 3px;
   transform: rotate(-7deg);
   box-shadow: 8px 12px 25px -12px #34462c40;
@@ -524,7 +524,7 @@
   padding: 0 0 32px;
 }
 .workspace .skeleton-surface {
-  background: linear-gradient(110deg, #ecefe5 20%, #f7f8f2 45%, #ecefe5 70%);
+  background: linear-gradient(110deg, #103323 20%, #1b4b34 45%, #103323 70%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 2.5s ease-in-out infinite;
 }
@@ -535,14 +535,14 @@
 }
 @media (min-width: 1024px) {
   .workspace-content {
-    padding-left: 220px !important;
+    padding-left: 256px !important;
   }
   .workspace .workspace-main {
     min-height: calc(100vh - 100px);
     border-radius: 32px 0 0 0;
-    background: linear-gradient(135deg, #fcfcf8 0%, #f5f6ef 70%);
-    border-top: 1px solid #fff;
-    border-left: 1px solid #e8ebdf;
+    background: linear-gradient(135deg, #0b2118 0%, #06130e 70%);
+    border-top: 1px solid var(--border-fine);
+    border-left: 1px solid #24483a;
   }
 }
 @media (max-width: 1100px) {
@@ -689,7 +689,7 @@
     border: 1px solid var(--border-fine);
     border-radius: 14px;
     padding: 18px;
-    background: #edf0e6;
+    background: #102d21;
   }
   .lesson-curriculum > summary {
     display: flex;
@@ -765,7 +765,7 @@
 }
 .reorder-item.drop-target {
   border-top-color: #567654;
-  background: #e8eedf;
+  background: #17432f;
 }
 .drag-handle {
   position: absolute;

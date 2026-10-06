@@ -12,7 +12,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </p>
           <div className="flex items-center gap-3">
             <span className="text-[11px] text-muted">Әкімші</span>
-            <span className="flex size-8 items-center justify-center rounded-full border border-line bg-white font-display text-xs">
+            <span className="flex size-8 items-center justify-center rounded-full border border-line bg-surface font-display text-xs">
               D.
             </span>
           </div>
