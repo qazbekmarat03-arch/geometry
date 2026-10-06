@@ -124,6 +124,15 @@ try {
     (error) => error.code === "23514",
   );
   checks++;
+  await db.exec(`update public.lessons set video_url='youtube://M7lc1UVf-VE' where id='${lesson}'`);
+  await eq(`select video_url from public.lessons where id='${lesson}'`, 'youtube://M7lc1UVf-VE', 'admin saves canonical YouTube lesson reference');
+  for (const invalid of ['youtube://short', 'youtube://M7lc1UVf-VE?token=x', 'https://youtube.com/watch?v=M7lc1UVf-VE']) {
+    await assert.rejects(
+      () => db.exec(`update public.lessons set video_url='${invalid}' where id='${lesson}'`),
+      (error) => error.code === '23514',
+    );
+    checks++;
+  }
   await db.exec(`update public.lessons set video_url='storage://course-media/allowed.mp4', duration=120 where id='${lesson}';
     update public.lessons set video_url='storage://course-media/locked.mp4' where id='${lockedLesson}';
     insert into storage.objects(bucket_id,name) values ('course-media','allowed.mp4'),('course-media','locked.mp4'),('course-media','unlinked.mp4');`);
