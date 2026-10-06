@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LoaderCircle, RefreshCw, VideoOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Playback } from "@/lib/video/types";
+import { loadYouTube } from "@/lib/video/youtube-player";
 import {
   formatPlaybackTime,
   playbackSeconds,
@@ -14,6 +15,7 @@ type EmbedPlayer = {
   on: (event: string, callback: (data?: unknown) => void) => void;
   off: (event: string) => void;
   setCurrentTime: (seconds: number) => void;
+  getCurrentTime?: () => number;
 };
 declare global {
   interface Window {
@@ -44,10 +46,12 @@ export function VideoPlayer({
   const duration = useRef(Infinity);
   const video = useRef<HTMLVideoElement>(null);
   const iframe = useRef<HTMLIFrameElement>(null);
+  const youtubeHost = useRef<HTMLDivElement>(null);
   const embed = useRef<EmbedPlayer | null>(null);
 
   const persist = useCallback(() => {
     if (!touched.current) return;
+    if (embed.current?.getCurrentTime) latest.current = embed.current.getCurrentTime();
     const seconds = playbackSeconds(latest.current);
     if (seconds === null || seconds === lastSent.current) return;
     lastSent.current = seconds;
@@ -115,6 +119,11 @@ export function VideoPlayer({
         )
           throw new Error("Видео сілтемесі жарамсыз.");
         if (!controller.signal.aborted) {
+          if (data.provider === "youtube") {
+            const url = new URL(data.url);
+            url.searchParams.set("origin", window.location.origin);
+            data.url = url.href;
+          }
           setPlayback(data);
           setError("");
         }
@@ -146,6 +155,7 @@ export function VideoPlayer({
     [],
   );
   function connectEmbed() {
+    if (playback?.provider === "youtube") return;
     detachEmbed();
     if (!iframe.current || !window.playerjs) return;
     const player = new window.playerjs.Player(iframe.current);
@@ -182,6 +192,41 @@ export function VideoPlayer({
     player.on("pause", persist);
     player.on("ended", persist);
   }
+  useEffect(() => {
+    if (playback?.provider !== "youtube") return;
+    let disposed = false;
+    let dispose: (() => void) | undefined;
+    void loadYouTube().then((sdk) => {
+      if (disposed || !youtubeHost.current) return;
+      const mount = document.createElement("div");
+      youtubeHost.current.appendChild(mount);
+      const player = new sdk.Player(mount, {
+        videoId: new URL(playback.url).pathname.split("/").pop()!,
+        host: "https://www.youtube-nocookie.com", width: "100%", height: "100%",
+        playerVars: { origin: window.location.origin, playsinline: 1, rel: 0 },
+        events: {
+        onReady() {
+          if (disposed) return;
+          duration.current = player.getDuration() || Infinity;
+          if (touched.current) player.seekTo(latest.current, true);
+          setReady(true);
+        },
+        onStateChange(event) {
+          if (disposed) return;
+          if (event.data === 1) { touched.current = true; setOfferResume(false); }
+          if (event.data === 2 || event.data === 0) persist();
+        },
+        onError() { if (!disposed) setError("YouTube видеосы ашылмады. Видеоның жариялануын және сайтта ойнатуға рұқсатын тексеріңіз."); },
+      } });
+      embed.current = {
+        on() {}, off() {},
+        getCurrentTime: () => player.getCurrentTime(),
+        setCurrentTime: (seconds) => player.seekTo(seconds, true),
+      };
+      dispose = () => { embed.current = null; player.destroy(); };
+    }).catch(() => { if (!disposed) setError("YouTube жүктелмеді. Қайта көріңіз."); });
+    return () => { disposed = true; dispose?.(); };
+  }, [playback, persist]);
   function chooseResume(resume: boolean) {
     const target = resume
       ? Math.min(savedPosition, Math.max(0, duration.current - 1))
@@ -252,6 +297,8 @@ export function VideoPlayer({
             <LoaderCircle size={22} className="animate-spin" />
             Видео жүктелуде…
           </div>
+        ) : playback.provider === "youtube" ? (
+          <div ref={youtubeHost} className="aspect-video w-full" aria-label="YouTube сабақ видеосы" />
         ) : playback.kind === "embed" ? (
           <iframe
             ref={iframe}

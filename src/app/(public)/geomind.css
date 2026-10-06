@@ -447,3 +447,6 @@
 @media (hover: none) { .gm-cursor { display: none; } }
 html.lenis, html.lenis body { height: auto; }
 html.lenis { scroll-behavior: auto !important; }
+
+.gm-teacher-photo { overflow: hidden; border-radius: 22px; background: white; max-width: 240px; margin-inline: auto; }
+.gm-teacher-photo img { display: block; width: 100%; height: auto; }

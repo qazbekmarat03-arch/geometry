@@ -127,7 +127,7 @@ export async function editContent(
           return {
             ok: false,
             message:
-              "Bunny Video ID, bunny://…, storage://course-media/… немесе vimeo://… енгізіңіз. Ашық MP4 сілтемелері қабылданбайды.",
+              "YouTube сілтемесі, YouTube Video ID, Bunny Video ID, bunny://…, storage://course-media/… немесе vimeo://… енгізіңіз. Ашық MP4 сілтемелері қабылданбайды.",
           };
         }
       }

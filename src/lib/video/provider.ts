@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Playback } from "./types";
+import { youtubeId } from "./youtube.ts";
 
 export class VideoUnavailable extends Error {}
 type ProviderContext = {
@@ -74,11 +75,12 @@ export async function createVideoPlayback(
   env: NodeJS.ProcessEnv = process.env,
   now = Math.floor(Date.now() / 1000),
 ): Promise<Playback> {
+  const youtube = reference?.startsWith("youtube://") ? youtubeId(reference) : null;
   const provider = providers[env.VIDEO_PROVIDER || "supabase"];
   const configuredTTL = Number(env.VIDEO_PLAYBACK_TTL_SECONDS || 300);
   if (
     !reference ||
-    !provider ||
+    (!provider && !youtube) ||
     !Number.isInteger(configuredTTL) ||
     configuredTTL < 30 ||
     configuredTTL > 900
@@ -91,6 +93,13 @@ export async function createVideoPlayback(
   );
   const ttl = expiresAt - now;
   if (!Number.isFinite(ttl) || ttl < 1) throw new VideoUnavailable();
+  // expiresAt is the platform authorization window, NOT YouTube URL expiry.
+  // YouTube links remain shareable outside this platform.
+  if (youtube) return {
+    provider: "youtube", kind: "embed",
+    url: `https://www.youtube-nocookie.com/embed/${youtube}?enablejsapi=1&playsinline=1&rel=0`,
+    expiresAt,
+  };
   return provider.createPlayback({
     reference,
     expiresAt,

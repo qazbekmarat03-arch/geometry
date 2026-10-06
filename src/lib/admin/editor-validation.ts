@@ -1,6 +1,9 @@
+import { youtubeId } from "../video/youtube.ts";
 export function videoReference(input: string): string | null {
   const value = input.trim();
   if (!value) return null;
+  const youtube = youtubeId(value);
+  if (youtube) return `youtube://${youtube}`;
   if (
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
       value,

@@ -70,15 +70,15 @@ export function ContentForm({
         {kind === "lesson" && values?.id && (
           <>
             <Input
-              label="Video ID / қорғалған видео сілтемесі"
+              label="YouTube сілтемесі / Video ID"
               name="video"
               defaultValue={values.video_url ?? ""}
-              placeholder="bunny://video-id"
+              placeholder="https://www.youtube.com/watch?v=..."
             />
             <p className="text-xs leading-5 text-muted">
-              Bunny Video ID немесе storage://course-media/файл. Ашық MP4
-              сілтемелері қолданылмайды. Vimeo үшін vimeo://ID сақтауға болады;
-              ойнату провайдері әзірге қосылмаған.
+              YouTube сілтемесін немесе 11 таңбалы Video ID енгізіңіз. YouTube-та сайтта ойнатуға рұқсат қосулы болуы керек.
+              YouTube сілтемесін басқа адамдарға бөлісуге болады: ол қорғалған видео қоймасы емес.
+              Қорғалған видео үшін Bunny ID немесе storage://course-media/файл қолданыңыз.
             </p>
             <Input
               label="Ұзақтығы (секунд)"

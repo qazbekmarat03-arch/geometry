@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -938,11 +939,8 @@ export function DURYSTAPLanding() {
           </div>
           <div className="gm-people-cards">
             <article className="gm-person-card" data-reveal>
-              <div className="gm-person-art" aria-hidden="true">
-                <div className="gm-person-orbit" />
-                <GraduationCap size={58} strokeWidth={1} />
-                <span>∑</span>
-                <i>π</i>
+              <div className="gm-teacher-photo">
+                <Image src="/images/qazbek.png" alt="Қазбек — геометрия курсының мұғалімі" width={500} height={500} sizes="(max-width: 600px) 240px, 180px" />
               </div>
               <div>
                 <span className="gm-eyebrow">

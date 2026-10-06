@@ -124,6 +124,14 @@ scripts/                    Isolated regression tests
 
 The application intentionally excludes payments, complex analytics and a general-purpose CMS.
 
+## YouTube lessons
+
+Admin → Courses → module → lesson editor accepts a YouTube watch/share/shorts URL or an 11-character video ID. Save and publish the lesson. YouTube embedding must be enabled; a private video will not play for students without YouTube's own permission. No YouTube API key or service-role key is required. YouTube lessons can coexist with the configured private video provider.
+
+The existing server and RLS checks still protect lesson pages, video API, and progress. YouTube itself does not issue expiring playback URLs: public/unlisted video links can be copied and watched outside the platform, even after platform access is revoked. Use Bunny signed playback for provider-enforced expiry. Playback position uses the official YouTube IFrame API and the existing 20-second/paused/page-exit persistence flow.
+
+Teacher portrait: `public/images/qazbek.png`, displayed with Next Image. Replace this file to update the portrait. Testimonials must be supplied by real students with permission; no fabricated endorsements are published.
+
 ## Current Vercel production setup
 
 The deployed site is `https://geometry-sigma.vercel.app`. GitHub stores source code; ignored `.env.local` values do not transfer to Vercel. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the Vercel project environment before rebuilding/redeploying. These public settings must reference the same Supabase project as the applied migrations. Google client secrets belong only in Supabase, never in public variables.
