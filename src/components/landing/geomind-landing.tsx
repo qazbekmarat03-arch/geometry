@@ -48,12 +48,12 @@ const copy = (language: Language) => (kk: string, ru: string, en: string) =>
 
 function Brand() {
   return (
-    <a href="#top" className="gm-brand" aria-label="GeoMind">
+    <a href="#top" className="gm-brand" aria-label="DURYSTAP">
       <span className="gm-brand-mark">
         <Layers3 size={23} strokeWidth={1.5} />
       </span>
-      geo<span>mind</span>
-      <sup>®</sup>
+      <span className="gm-brand-durys">DURYS</span>
+      <span className="gm-brand-tap">TAP</span>
     </a>
   );
 }
@@ -241,7 +241,7 @@ function Lab({ language, paused }: { language: Language; paused: boolean }) {
   );
 }
 
-export function GeoMindLanding() {
+export function DURYSTAPLanding() {
   const [language, setLanguage] = useState<Language>("kk");
   const [light, setLight] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -274,7 +274,7 @@ export function GeoMindLanding() {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const body = `GeoMind курсына қызығушылық\nАты: ${data.get("name")}\nКурс бағасы: 50 000 ₸\nСұрақ: ${data.get("message") || "Курсқа қалай қосыламын?"}`;
+    const body = `DURYSTAP курсына қызығушылық\nАты: ${data.get("name")}\nКурс бағасы: 50 000 ₸\nСұрақ: ${data.get("message") || "Курсқа қалай қосыламын?"}`;
     window.open(
       `${WHATSAPP_URL}?text=${encodeURIComponent(body)}`,
       "_blank",
@@ -345,7 +345,7 @@ export function GeoMindLanding() {
     ],
   ];
   const nav = [
-    ["#why", t("Артықшылықтар", "Преимущества", "Why GeoMind")],
+    ["#why", t("Артықшылықтар", "Преимущества", "Why DURYSTAP")],
     ["#program", t("Бағдарлама", "Программа", "Curriculum")],
     ["#lab", "3D " + t("зертхана", "лаборатория", "lab")],
     ["#pricing", t("Бағасы", "Стоимость", "Pricing")],
@@ -601,7 +601,7 @@ export function GeoMindLanding() {
           <div className="gm-section-heading" data-reveal>
             <div>
               <span className="gm-eyebrow">
-                01 / {t("НЕГЕ GEOMIND?", "ПОЧЕМУ GEOMIND?", "WHY GEOMIND?")}
+                01 / {t("НЕГЕ DURYSTAP?", "ПОЧЕМУ DURYSTAP?", "WHY DURYSTAP?")}
               </span>
               <h2>
                 {t("Күрделі көрінеді.", "Кажется сложным.", "Looks complex.")}
@@ -948,20 +948,32 @@ export function GeoMindLanding() {
                 <span className="gm-eyebrow">
                   {t("КУРС МҰҒАЛІМДЕРІ", "ПРЕПОДАВАТЕЛИ", "YOUR TEACHERS")}
                 </span>
-                <h3>
-                  {t(
-                    "Әр түсініктің артында — ұстаз.",
-                    "За каждым объяснением — учитель.",
-                    "A teacher behind every insight.",
-                  )}
-                </h3>
+                <h3>{t("Қазбек", "Казбек", "Qazbek")}</h3>
                 <p>
                   {t(
-                    "Мұғалімдермен таныстыру ақпараты жақында осы жерде жарияланады.",
-                    "Скоро здесь появится информация о преподавателях.",
-                    "Meet-the-teacher profiles will be published here soon.",
+                    "SDU университетінде математика мұғалімдігі бойынша бакалавр мен магистратураны аяқтағанмын. 5 000-нан астам оқушы оқыттым.",
+                    "Окончил бакалавриат и магистратуру SDU по подготовке учителей математики. Обучил более 5 000 учеников.",
+                    "I hold bachelor’s and master’s degrees in mathematics teacher education from SDU. I have taught more than 5,000 students.",
                   )}
                 </p>
+                <p>
+                  {t(
+                    "Оқушыларымның арасында 50/50 алғандар бар. Түлектерім SDU, KBTU және Қазақстанның басқа жетекші университеттерінде, сондай-ақ Қытайда, Италияда және АҚШ-та оқиды.",
+                    "Среди моих учеников есть набравшие 50/50. Выпускники учатся в SDU, KBTU и других ведущих вузах Казахстана, а также в Китае, Италии и США.",
+                    "My students include learners who scored 50/50. Graduates study at SDU, KBTU and other leading universities in Kazakhstan, as well as in China, Italy and the USA.",
+                  )}
+                </p>
+                <div className="gm-teacher-facts">
+                  <span>5 000+ {t("оқушы", "учеников", "students")}</span>
+                  <span>
+                    SDU ·{" "}
+                    {t(
+                      "бакалавр + магистр",
+                      "бакалавр + магистр",
+                      "bachelor’s + master’s",
+                    )}
+                  </span>
+                </div>
               </div>
             </article>
             <article className="gm-quote-card" data-reveal>
@@ -978,9 +990,9 @@ export function GeoMindLanding() {
               </h3>
               <p>
                 {t(
-                  "Алғашқы оқушылардың шынайы пікірлері осында жиналады. Ал сен өз жолыңды бүгін бастай аласың.",
-                  "Здесь появятся настоящие отзывы первых учеников. А свой путь можно начать уже сегодня.",
-                  "Real feedback from our first students will live here. Your own journey can start today.",
+                  "Оқушылардың өз сөзімен жазылған пікірлері мен нәтижелері келісімімен осында жарияланады.",
+                  "Здесь будут опубликованы отзывы и результаты учеников с их согласия.",
+                  "Students’ own feedback and results will be published here with their permission.",
                 )}
               </p>
               <a href="#enroll" className="gm-text-link">
@@ -1018,57 +1030,6 @@ export function GeoMindLanding() {
               </p>
             </div>
             <div className="gm-pricing-grid">
-              <article className="gm-price-card" data-reveal>
-                <span className="gm-price-icon">
-                  <Rotate3D size={23} />
-                </span>
-                <h3>{t("Алғашқы қадам", "Первый шаг", "First steps")}</h3>
-                <p>
-                  {t(
-                    "GeoMind тәсілін өзің байқап көр.",
-                    "Попробуй подход GeoMind.",
-                    "Get a feel for the GeoMind approach.",
-                  )}
-                </p>
-                <strong className="gm-price">
-                  {t("Тегін", "Бесплатно", "Free")}
-                </strong>
-                <span className="gm-price-note">
-                  {t(
-                    "Ашық 3D зертхана",
-                    "Открытая 3D лаборатория",
-                    "Open 3D lab",
-                  )}
-                </span>
-                <ul>
-                  {[
-                    t(
-                      "3 интерактивті фигура",
-                      "3 интерактивные фигуры",
-                      "3 interactive shapes",
-                    ),
-                    t(
-                      "Аудан мен көлем есебі",
-                      "Расчёт площади и объёма",
-                      "Live area and volume",
-                    ),
-                    t(
-                      "Тіркелу қажет емес",
-                      "Без регистрации",
-                      "No signup needed",
-                    ),
-                  ].map((text) => (
-                    <li key={text}>
-                      <Check size={16} />
-                      {text}
-                    </li>
-                  ))}
-                </ul>
-                <a href="#lab" className="gm-button gm-button-outline">
-                  {t("Байқап көру", "Попробовать", "Try it out")}
-                  <ArrowUpRight size={17} />
-                </a>
-              </article>
               <article className="gm-price-card gm-price-featured" data-reveal>
                 <div className="gm-price-badge">
                   <Sparkles size={12} />
@@ -1077,12 +1038,12 @@ export function GeoMindLanding() {
                 <span className="gm-price-icon">
                   <Layers3 size={23} />
                 </span>
-                <h3>GeoMind</h3>
+                <h3>DURYSTAP</h3>
                 <p>
                   {t(
-                    "Геометрияны жүйелі түсінуге арналған курс.",
-                    "Курс для системного понимания геометрии.",
-                    "Your structured path to understanding geometry.",
+                    "Түсіну, практика және қолдау — бәрі бір курста.",
+                    "Понимание, практика и поддержка — в одном курсе.",
+                    "Understanding, practice and support — in one course.",
                   )}
                 </p>
                 <strong className="gm-price gm-mono">
@@ -1108,14 +1069,39 @@ export function GeoMindLanding() {
                       "Video lessons in Kazakh",
                     ),
                     t(
-                      "PDF үй тапсырмалары",
-                      "Домашние задания в PDF",
-                      "PDF homework",
+                      "Үй тапсырмалары + толық шешімдері",
+                      "Домашние задания + полные решения",
+                      "Homework + full solutions",
                     ),
                     t(
                       "Жеке кабинет және прогресс",
                       "Личный кабинет и прогресс",
                       "Your dashboard and progress",
+                    ),
+                    t(
+                      "Әр апта сайын білімді бекітетін тест",
+                      "Еженедельные тесты для закрепления",
+                      "Weekly tests to consolidate learning",
+                    ),
+                    t(
+                      "Әр сабаққа жеке жұмыс дәптері",
+                      "Рабочая тетрадь к каждому уроку",
+                      "A workbook for every lesson",
+                    ),
+                    t(
+                      "Мұғаліммен байланыс",
+                      "Связь с преподавателем",
+                      "Contact with your teacher",
+                    ),
+                    t(
+                      "База қалыптастыруға арналған 10 тегін сабақ",
+                      "10 бесплатных уроков для формирования базы",
+                      "10 free foundation-building lessons",
+                    ),
+                    t(
+                      "Геометрияның барлық тарауы мен тақырыбы",
+                      "Все разделы и темы геометрии",
+                      "All geometry chapters and topics",
                     ),
                   ].map((text) => (
                     <li key={text}>
@@ -1389,7 +1375,7 @@ export function GeoMindLanding() {
           </div>
         </div>
         <div className="gm-footer-bottom">
-          <span>© {new Date().getFullYear()} GeoMind · DURYSTAP Geometry</span>
+          <span>© {new Date().getFullYear()} DURYSTAP · DURYSTAP Geometry</span>
           <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
             <MessageCircle size={14} /> WhatsApp · +7 775 585 12 03
             <ArrowUpRight size={12} />

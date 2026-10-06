@@ -123,3 +123,9 @@ scripts/                    Isolated regression tests
 ```
 
 The application intentionally excludes payments, complex analytics and a general-purpose CMS.
+
+## Current Vercel production setup
+
+The deployed site is `https://geometry-sigma.vercel.app`. GitHub stores source code; ignored `.env.local` values do not transfer to Vercel. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the Vercel project environment before rebuilding/redeploying. These public settings must reference the same Supabase project as the applied migrations. Google client secrets belong only in Supabase, never in public variables.
+
+In Supabase Authentication → URL Configuration, production requires Site URL `https://geometry-sigma.vercel.app` and the exact allowed redirect `https://geometry-sigma.vercel.app/auth/callback`. Keep `http://localhost:3000/auth/callback` for development. Do not allow all Vercel domains via a wildcard. Google Cloud keeps the Supabase `/auth/v1/callback` URI; the browser-facing app callback is configured in Supabase. A disabled Google button means the deployed app is missing its Supabase configuration, not that Google must be bypassed.

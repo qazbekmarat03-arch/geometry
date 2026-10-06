@@ -34,7 +34,8 @@ export function Logo() {
         <circle cx="18" cy="20" r="2.5" fill="currentColor" />
       </svg>
       <span className="font-display text-[17px] font-bold tracking-[-.055em]">
-        DURYSTAP
+        <span className="text-brand">DURYS</span>
+        <span>TAP</span>
         <span className="mt-1 block text-[8px] font-medium tracking-[.35em] text-muted">
           G E O M E T R Y
         </span>

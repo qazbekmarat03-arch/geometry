@@ -40,6 +40,8 @@
 .gm-nav { max-width: 1240px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 25px; padding: 13px 15px 13px 22px; border: 1px solid var(--gm-line); border-radius: 100px; background: var(--gm-glass); box-shadow: 0 12px 40px #00000014, inset 0 1px #ffffff05; backdrop-filter: blur(24px); }
 .gm-brand { display: inline-flex; align-items: center; gap: 0; font-size: 25px; line-height: 1; letter-spacing: -1.4px; font-weight: 650; white-space: nowrap; }
 .gm-brand > span:not(.gm-brand-mark) { font-weight: 400; }
+.gm-brand > .gm-brand-durys { color: var(--gm-green); font-weight: 650; }
+.gm-brand > .gm-brand-tap { color: var(--gm-text); font-weight: 650; }
 .gm-brand sup { align-self: flex-start; font-size: 10px; margin: 2px 0 0 3px; letter-spacing: 0; color: var(--gm-muted); }
 .gm-brand-mark { display: inline-flex; align-items: center; justify-content: center; margin-right: 9px; color: var(--gm-green); transform: rotate(-12deg); }
 .gm-desktop-links { display: flex; gap: 29px; font-size: 12px; color: var(--gm-muted); }
@@ -209,7 +211,9 @@
 .gm-center-heading { text-align: center; margin-bottom: 55px; }
 .gm-center-heading .gm-eyebrow { justify-content: center; }
 .gm-center-heading p { color: var(--gm-muted); font-size: 12px; margin-top: 17px; }
-.gm-pricing-grid { display: grid; grid-template-columns: 1fr 1.06fr 1fr; gap: 20px; align-items: center; }
+.gm-pricing-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: center; max-width: 940px; margin-inline: auto; }
+.gm-teacher-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.gm-teacher-facts span { border: 1px solid var(--gm-line); padding: 7px 10px; border-radius: 9px; color: var(--gm-green); font-size: 10px; }
 .gm-price-card { padding: 29px; background: var(--gm-panel); border: 1px solid var(--gm-line); border-radius: 26px; position: relative; display: flex; flex-direction: column; min-height: 461px; }
 .gm-price-icon { color: var(--gm-green); margin-bottom: 17px; }
 .gm-price-card h3 { font-size: 22px; font-weight: 500; letter-spacing: -.04em; }
