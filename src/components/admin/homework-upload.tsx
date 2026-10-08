@@ -48,22 +48,16 @@ export function HomeworkUpload({
           </select>
         </div>
       )}
-      <div className="space-y-3">
-        <label htmlFor="homework-source" className="block text-sm font-medium">
+      <fieldset className="space-y-3" disabled={pending}>
+        <legend className="text-sm font-medium">
           Тапсырманы қосу тәсілі
-        </label>
-        <select
-          id="homework-source"
-          name="source"
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-          disabled={pending}
-          className="w-full rounded-xl border border-line bg-surface p-3 text-sm"
-        >
-          <option value="file">Компьютерден PDF</option>
-          <option value="drive">Google Drive сілтемесі</option>
-        </select>
-      </div>
+        </legend>
+        <input type="hidden" name="source" value={source} />
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant={source === "file" ? "primary" : "secondary"} aria-pressed={source === "file"} onClick={() => setSource("file")}>Компьютерден PDF</Button>
+          <Button type="button" variant={source === "drive" ? "primary" : "secondary"} aria-pressed={source === "drive"} onClick={() => setSource("drive")}>Google Drive сілтемесі</Button>
+        </div>
+      </fieldset>
       {source === "drive" ? (
         <div className="space-y-3">
           <label htmlFor="homework-drive" className="block text-sm font-medium">

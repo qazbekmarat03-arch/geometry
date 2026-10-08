@@ -3,13 +3,13 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 const displayFont = localFont({
-  src: "../../public/fonts/noto-sans-variable.ttf",
+  src: "../../public/fonts/noto-sans-variable.woff2",
   variable: "--font-heading",
   display: "swap",
   weight: "100 900",
 });
 const bodyFont = localFont({
-  src: "../../public/fonts/inter-variable.ttf",
+  src: "../../public/fonts/inter-variable.woff2",
   variable: "--font-inter",
   display: "swap",
   weight: "100 900",

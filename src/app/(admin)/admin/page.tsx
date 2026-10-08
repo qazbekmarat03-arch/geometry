@@ -54,7 +54,7 @@ export default async function AdminPage() {
       />
       <section aria-label="Жалпы мәлімет" className="admin-metrics">
         {cards.map(({ title, value, icon: Icon, href }) => (
-          <Link key={title} href={href} className="admin-metric group">
+          <Link prefetch={false} key={title} href={href} className="admin-metric group">
             <div className="h-full transition-colors group-hover:text-brand">
               <div className="mb-6 flex items-center justify-between">
                 <span className="flex size-11 items-center justify-center rounded-xl text-muted">
@@ -88,7 +88,7 @@ export default async function AdminPage() {
             </h2>
             <p className="mt-1 text-sm text-muted">Соңғы тіркелген оқушылар.</p>
           </div>
-          <Link
+          <Link prefetch={false}
             href="/admin/students"
             className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-brand hover:underline"
           >

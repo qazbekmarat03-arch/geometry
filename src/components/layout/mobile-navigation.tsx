@@ -63,7 +63,7 @@ export function MobileNavigation({
               (pathname === link.href ||
                 (index !== 0 && pathname.startsWith(`${link.href}/`)));
             return (
-              <Link
+              <Link prefetch={signedIn ? false : undefined}
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}

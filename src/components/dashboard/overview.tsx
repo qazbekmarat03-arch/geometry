@@ -110,7 +110,7 @@ export function RecentLessons({ data }: { data: Dashboard }) {
         <ul className="divide-y divide-line">
           {data.recent.map((lesson) => (
             <li key={lesson.id}>
-              <Link
+              <Link prefetch={false}
                 href={lessonHref(lesson.courseId, lesson.id)}
                 className="flex items-start gap-3 rounded-lg py-4 transition-colors hover:bg-surface"
               >

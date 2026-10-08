@@ -62,7 +62,7 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
             (i > 0 && pathname.startsWith(href + "/")) ||
             (href === "/admin/lessons" && pathname === "/admin/homework");
           return (
-            <Link
+            <Link prefetch={false}
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
@@ -89,7 +89,7 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
               {admin ? "Анық басқару." : "жаңа мүмкіндік."}
             </span>
           </p>
-          <Link
+          <Link prefetch={false}
             href={admin ? "/dashboard" : "/#program"}
             className="mt-4 inline-flex items-center gap-3 text-[11px] text-muted"
           >

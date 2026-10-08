@@ -1153,7 +1153,7 @@ export function DURYSTAPLanding() {
               { name: "Әсемгүл", math: 50, total: 134, date: "29.05.2025" },
               { name: "Нұрахмет", math: 45, total: 125, date: "30.05.2025" },
               { name: "Нұртас", math: 46, total: 123, date: "24.06.2025" },
-              { name: "Сұлтан", math: 42, total: 111, date: "02.06.2025" },
+              { name: "Сұлтан", math: 42, total: 111, date: "03.06.2025" },
             ].map((result) => (
               <article key={result.name} className="gm-result-card" data-reveal>
                 <div className="gm-card-top">

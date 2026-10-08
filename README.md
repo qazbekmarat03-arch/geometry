@@ -147,6 +147,8 @@ After saving, Drive sharing can be closed again. Students receive only the platf
 
 ## Request latency
 
-Invitation/owner claims run only at the verified OAuth callback. Protected requests still check the authenticated identity, current profile and active/unexpired grant on every request. No permission results are cached across users or requests. A lesson page loads only its own course curriculum, rather than every enrolled course. `vercel.json` puts server functions in `bom1`, alongside the Supabase Mumbai database; update this if the database moves. Decorative WebGL remains isolated to the public landing page.
+Invitation/owner claims run only at the verified OAuth callback. Protected requests still check the authenticated identity, current profile and active/unexpired grant on every request. No permission results are cached across users or requests. A lesson page loads only its own course curriculum, rather than every enrolled course. `vercel.json` puts server functions in `bom1`, alongside the Supabase Mumbai database; update this if the database moves. Protected sidebar links do not prefetch unopened pages, reducing parallel permission/database requests. Decorative WebGL remains isolated to the public landing page.
 
 Landing result cards transcribe teacher-provided 2025 UNT scores using first names only; original documents with personal identifiers and QR codes are not published. No fabricated student quotations are included.
+
+Display/body fonts ship as WOFF2 subsets covering Latin, Cyrillic (including all Kazakh letters), punctuation and common mathematical symbols. Original font licenses remain in `public/fonts`.
