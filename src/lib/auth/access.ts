@@ -23,6 +23,7 @@ export type AccountAccess =
 // Never trust browser state, URL parameters, or Google/user metadata for access.
 export async function getAccountAccess(
   supabase: SupabaseClient,
+  { claimOnLogin = false }: { claimOnLogin?: boolean } = {},
 ): Promise<AccountAccess> {
   const {
     data: { user },
@@ -34,7 +35,7 @@ export async function getAccountAccess(
 
   // This RPC accepts no user/email arguments and verifies the Google identity
   // again inside Postgres. It cannot promote anyone except the fixed owner.
-  if (isGoogleOwner(user)) {
+  if (claimOnLogin && isGoogleOwner(user)) {
     const { error: ownerError } = await supabase.rpc("claim_owner_admin");
     if (ownerError) return denied;
   }
@@ -55,10 +56,12 @@ export async function getAccountAccess(
   if (profile.role !== "student") return denied;
 
   // The database claims only this verified identity's single-use invitations.
-  const { error: invitationError } = await supabase.rpc(
-    "claim_student_invitations",
-  );
-  if (invitationError) return denied;
+  if (claimOnLogin) {
+    const { error: invitationError } = await supabase.rpc(
+      "claim_student_invitations",
+    );
+    if (invitationError) return denied;
+  }
 
   const { data: grants, error: accessError } = await supabase
     .from("course_access")

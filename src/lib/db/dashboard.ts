@@ -8,21 +8,23 @@ import {
   type Progress,
 } from "@/lib/dashboard/model";
 
-export const getDashboardData = cache(async () => {
+export const getDashboardData = cache(async (courseId?: string) => {
   const user = await requireUser();
   const supabase = await createClient();
+  let accessQuery = supabase
+    .from("course_access")
+    .select("course_id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+  if (courseId) accessQuery = accessQuery.eq("course_id", courseId);
   const [profileResult, accessResult, progressResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, email, avatar_url")
       .eq("id", user.id)
       .single(),
-    supabase
-      .from("course_access")
-      .select("course_id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`),
+    accessQuery,
     supabase
       .from("lesson_progress")
       .select("lesson_id, completed, video_progress, updated_at")

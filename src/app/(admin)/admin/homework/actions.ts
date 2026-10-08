@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { validId } from "@/lib/course/media";
 import { MAX_PDF_SIZE, pdfName, validPdfHeader } from "@/lib/homework/files";
+import { importDrivePdf } from "@/lib/homework/drive";
 export type UploadState = { ok: boolean; message: string };
 export async function uploadHomework(
   _previous: UploadState,
@@ -13,18 +14,38 @@ export async function uploadHomework(
   await requireAdmin();
   const lessonId = form.get("lessonId");
   const file = form.get("file");
-  if (
-    !validId(lessonId) ||
-    !(file instanceof File) ||
-    !/\.pdf$/i.test(file.name) ||
-    file.type !== "application/pdf" ||
-    file.size < 5 ||
-    file.size > MAX_PDF_SIZE
-  )
-    return { ok: false, message: "10 МБ-тан аспайтын PDF файлын таңдаңыз." };
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  if (!validPdfHeader(bytes))
-    return { ok: false, message: "Файл PDF пішіміне сәйкес келмейді." };
+  if (!validId(lessonId)) return { ok: false, message: "Сабақты таңдаңыз." };
+  let bytes: Uint8Array;
+  let name: string;
+  if (form.get("source") === "drive") {
+    try {
+      bytes = await importDrivePdf(String(form.get("driveUrl") || ""));
+      const label = String(form.get("fileName") || "Үй тапсырмасы").trim();
+      name = pdfName(/\.pdf$/i.test(label) ? label : `${label}.pdf`);
+    } catch (error) {
+      return {
+        ok: false,
+        message:
+          error instanceof Error && error.name !== "TimeoutError"
+            ? error.message
+            : "Drive жауап бермеді. Қайта көріңіз.",
+      };
+    }
+  } else {
+    if (
+      !validId(lessonId) ||
+      !(file instanceof File) ||
+      !/\.pdf$/i.test(file.name) ||
+      file.type !== "application/pdf" ||
+      file.size < 5 ||
+      file.size > MAX_PDF_SIZE
+    )
+      return { ok: false, message: "10 МБ-тан аспайтын PDF файлын таңдаңыз." };
+    bytes = new Uint8Array(await file.arrayBuffer());
+    if (!validPdfHeader(bytes))
+      return { ok: false, message: "Файл PDF пішіміне сәйкес келмейді." };
+    name = pdfName(file.name);
+  }
   const supabase = await createClient();
   const lesson = await supabase
     .from("lessons")
@@ -50,7 +71,7 @@ export async function uploadHomework(
     .from("lessons")
     .update({
       homework_pdf_url: `storage://homework/${path}`,
-      homework_file_name: pdfName(file.name),
+      homework_file_name: name,
       homework_uploaded_at: new Date().toISOString(),
     })
     .eq("id", lessonId)

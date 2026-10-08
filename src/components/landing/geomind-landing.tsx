@@ -23,7 +23,6 @@ import {
   Pause,
   Play,
   Plus,
-  Quote,
   Rotate3D,
   Sparkles,
   Sun,
@@ -63,7 +62,48 @@ function Brand() {
 function Lab({ language, paused }: { language: Language; paused: boolean }) {
   const t = copy(language);
   const [solid, setSolid] = useState<Solid>("cube");
-  const [size, setSize] = useState(3);
+  const [size, setSize] = useState(2);
+  const [challenge, setChallenge] = useState(0);
+  const [answer, setAnswer] = useState<number | null>(null);
+  const challenges = [
+    {
+      question: t(
+        "Кубтың қырын 2 есе ұзартсақ, көлемі неше есе өседі?",
+        "Во сколько раз вырастет объём куба, если удвоить ребро?",
+        "Double a cube’s edge. How much does its volume grow?",
+      ),
+      choices: [2, 4, 8],
+      correct: 8,
+      size: 4,
+      explanation: "2³ = 8 → 4³ = 64. 64 ÷ 8 = 8",
+      unit: t("есе", "раз", "times"),
+    },
+    {
+      question: t(
+        "Ал сол кубтың бетінің ауданы неше есе өседі?",
+        "А во сколько раз вырастет площадь поверхности?",
+        "How much does its surface area grow?",
+      ),
+      choices: [2, 4, 8],
+      correct: 4,
+      size: 4,
+      explanation: "6 × 2² = 24 → 6 × 4² = 96. 96 ÷ 24 = 4",
+      unit: t("есе", "раз", "times"),
+    },
+    {
+      question: t(
+        "Көлемі 27 см³ кубтың қырын тап.",
+        "Найди ребро куба объёмом 27 см³.",
+        "Find the edge of a cube with volume 27 cm³.",
+      ),
+      choices: [3, 6, 9],
+      correct: 3,
+      size: 3,
+      explanation: "V = a³ → a = ∛27 = 3 см",
+      unit: t("см", "см", "cm"),
+    },
+  ];
+  const task = challenges[challenge];
   const [visible, setVisible] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -134,12 +174,79 @@ function Lab({ language, paused }: { language: Language; paused: boolean }) {
         </div>
       </div>
       <div className="gm-lab-controls">
+        <div className="gm-challenge">
+          <span className="gm-eyebrow">
+            {t("3 ҚАДАМДЫ ЧЕЛЛЕНДЖ", "ЧЕЛЛЕНДЖ В 3 ШАГА", "3-STEP CHALLENGE")} ·{" "}
+            {challenge + 1}/3
+          </span>
+          <h3>{task.question}</h3>
+          <p>
+            {t(
+              "Алдымен болжам жаса. Сосын 3D фигурамен тексер.",
+              "Сначала предположи. Потом проверь на 3D-фигуре.",
+              "Make a prediction. Then check it in 3D.",
+            )}
+          </p>
+          <div
+            className="gm-challenge-answers"
+            role="group"
+            aria-label={t("Жауабың", "Твой ответ", "Your answer")}
+          >
+            {task.choices.map((choice) => (
+              <button
+                key={choice}
+                type="button"
+                aria-pressed={answer === choice}
+                onClick={() => {
+                  setAnswer(choice);
+                  setSolid("cube");
+                  setSize(task.size);
+                }}
+              >
+                {choice} {task.unit}
+              </button>
+            ))}
+          </div>
+          {answer !== null && (
+            <div className="gm-challenge-feedback" role="status">
+              <strong>
+                {answer === task.correct
+                  ? t("Дұрыс!", "Верно!", "Correct!")
+                  : t(
+                      "Бірге тексерейік.",
+                      "Давай проверим.",
+                      "Let’s check together.",
+                    )}
+              </strong>
+              <p>{task.explanation}</p>
+              <button
+                type="button"
+                className="gm-text-link"
+                onClick={() => {
+                  setChallenge((challenge + 1) % 3);
+                  setAnswer(null);
+                  setSolid("cube");
+                  setSize(2);
+                }}
+              >
+                {challenge === 2
+                  ? t("Қайта байқап көр", "Попробовать снова", "Try again")
+                  : t(
+                      "Келесі тапсырма",
+                      "Следующее задание",
+                      "Next challenge",
+                    )}{" "}
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
         <span className="gm-eyebrow">
           {t("ӨЗІҢ ЗЕРТТЕ", "ИССЛЕДУЙ", "EXPLORE IT")}
         </span>
         <h3>
           {t(
-            "Формулаға жан бітір.",
+            "Енді өзің тәжірибе жаса.",
             "Оживи формулу.",
             "Bring formulas to life.",
           )}
@@ -606,11 +713,11 @@ export function DURYSTAPLanding() {
                 01 / {t("НЕГЕ DURYSTAP?", "ПОЧЕМУ DURYSTAP?", "WHY DURYSTAP?")}
               </span>
               <h2>
-                {t("Күрделі көрінеді.", "Кажется сложным.", "Looks complex.")}
+                {t("Формуланы білесің.", "Кажется сложным.", "Looks complex.")}
                 <br />
                 <span>
                   {t(
-                    "Түсінсең — оңай.",
+                    "Есеп неге шықпайды?",
                     "Поймёшь — станет проще.",
                     "Feels simple.",
                   )}
@@ -619,7 +726,7 @@ export function DURYSTAPLanding() {
             </div>
             <p>
               {t(
-                "Бір формуланың артында тұтас әлем бар. Біз сол әлемді бірге ашамыз.",
+                "Мәселе қабілетіңде емес. Сызбаны түсіну, дұрыс тәсілді таңдау және өзің шешіп көру — үшеуін бірге үйрену керек. DURYSTAP-та осы жолмен жүреміз.",
                 "За каждой формулой — целый мир. Откроем его вместе.",
                 "There is a whole world behind every formula. Let's explore it together.",
               )}
@@ -671,14 +778,14 @@ export function DURYSTAPLanding() {
               </div>
               <h3>
                 {t(
-                  "Көр. Айналдыр. Түсін.",
+                  "Сызбаға қарап, неден бастарыңды білмейсің бе?",
                   "Смотри. Вращай. Понимай.",
                   "See. Rotate. Understand.",
                 )}
               </h3>
               <p>
                 {t(
-                  "Жазық сызбадан шығып, фигураны барлық жағынан зертте. Кеңістікте ойлауды дамыт.",
+                  "Есептің берілгенін сызбаға түсіріп, қандай қасиет көмектесетінін қадамдап талдаймыз. Дайын формуладан бұрын оның неге қажет екенін түсінесің.",
                   "Выйди за рамки плоских схем. Исследуй фигуру со всех сторон.",
                   "Go beyond flat diagrams. Explore shapes from every angle.",
                 )}
@@ -706,14 +813,14 @@ export function DURYSTAPLanding() {
               </div>
               <h3>
                 {t(
-                  "Аз уақыт. Анық түсінік.",
+                  "Базаң әлсіз болса, қайдан бастайсың?",
                   "Меньше времени. Больше ясности.",
                   "Less time. More clarity.",
                 )}
               </h3>
               <p>
                 {t(
-                  "Қысқа видео, нақты мысал. Кез келген сәтті қайта көріп, өзіңе ыңғайлы қарқынмен оқы.",
+                  "10 база қалыптастыру сабағынан баста. Әрі қарай планиметриядан стереометрияға дейін ретімен өт. Түсінбеген жеріңді қайта көр — ешкімнің қарқынына ілесу міндет емес.",
                   "Короткое видео, понятный пример. Пересматривай и учись в своём темпе.",
                   "Focused videos. Clear examples. Replay any moment at your own pace.",
                 )}
@@ -728,11 +835,15 @@ export function DURYSTAPLanding() {
                 <FileText size={19} />
               </span>
               <h3>
-                {t("Білгеніңді бекіт.", "Закрепляй знания.", "Make it stick.")}
+                {t(
+                  "Видеода түсінікті. Жалғыз қалсаң — қиын ба?",
+                  "Закрепляй знания.",
+                  "Make it stick.",
+                )}
               </h3>
               <p>
                 {t(
-                  "PDF тапсырмалармен теорияны практикаға айналдыр.",
+                  "Әр сабаққа жұмыс дәптері мен үй тапсырмасы беріледі. Алдымен өзің шеш, кейін шешімімен салыстыр. Қиналған сұрағыңды мұғалімге қой.",
                   "Превращай теорию в практику с PDF-заданиями.",
                   "Turn theory into practice with PDF exercises.",
                 )}
@@ -766,14 +877,14 @@ export function DURYSTAPLanding() {
                 </span>
                 <h3>
                   {t(
-                    "Әр қадам — алға.",
+                    "Оқып жүрсің. Бірақ не меңгергенің белгісіз бе?",
                     "Каждый шаг — вперёд.",
                     "Every step is progress.",
                   )}
                 </h3>
                 <p>
                   {t(
-                    "Жеке кабинетте аяқталған сабақтарды көріп, тоқтаған жеріңнен жалғастыр.",
+                    "Апта сайынғы тест әлсіз тақырыптарыңды анықтауға көмектеседі. Жеке кабинетте аяқталған сабақтарды көріп, қайталауға қажет жерге орал.",
                     "Следи за пройденными уроками и продолжай с того же места.",
                     "Track completed lessons and continue where you left off.",
                   )}
@@ -905,7 +1016,7 @@ export function DURYSTAPLanding() {
             </div>
             <p>
               {t(
-                "Геометрия — тек қағазда емес. Бір қырды өзгертіп, бүкіл фигураның қалай өзгеретінін көр.",
+                "Интуицияңды тексер: қыр 2 есе артса, көлем де 2 есе өсе ме? Жауапты таңда, фигураны өзгерт, айырмашылықты өзің көр.",
                 "Геометрия — не только на бумаге. Измени размер и посмотри, как изменится фигура.",
                 "Geometry lives beyond the page. Change one dimension and watch the whole shape respond.",
               )}
@@ -941,7 +1052,13 @@ export function DURYSTAPLanding() {
           <div className="gm-people-cards">
             <article className="gm-person-card" data-reveal>
               <div className="gm-teacher-photo">
-                <Image src="/images/qazbek.png" alt="Қазбек — геометрия курсының мұғалімі" width={500} height={500} sizes="(max-width: 600px) 240px, 180px" />
+                <Image
+                  src="/images/qazbek.png"
+                  alt="Қазбек — геометрия курсының мұғалімі"
+                  width={500}
+                  height={500}
+                  sizes="(max-width: 600px) 240px, 180px"
+                />
               </div>
               <div>
                 <span className="gm-eyebrow">
@@ -976,30 +1093,95 @@ export function DURYSTAPLanding() {
               </div>
             </article>
             <article className="gm-quote-card" data-reveal>
-              <Quote size={30} strokeWidth={1} />
+              <GraduationCap size={32} />
               <span className="gm-eyebrow">
-                {t("ОҚУШЫЛАР ПІКІРІ", "ОТЗЫВЫ УЧЕНИКОВ", "STUDENT STORIES")}
+                {t("НАҚТЫ НӘТИЖЕЛЕР", "РЕАЛЬНЫЕ РЕЗУЛЬТАТЫ", "REAL RESULTS")}
               </span>
               <h3>
                 {t(
-                  "Келесі оқиға — сенікі.",
-                  "Следующая история — твоя.",
-                  "The next story is yours.",
+                  "Математикадан 50/50. Бұл — Әсемгүлдің нәтижесі.",
+                  "50/50 по математике. Результат Асемгуль.",
+                  "50/50 in mathematics. Asemgul’s result.",
                 )}
               </h3>
               <p>
                 {t(
-                  "Оқушылардың өз сөзімен жазылған пікірлері мен нәтижелері келісімімен осында жарияланады.",
-                  "Здесь будут опубликованы отзывы и результаты учеников с их согласия.",
-                  "Students’ own feedback and results will be published here with their permission.",
+                  "Бір күндік шабыттан — жүйелі дайындыққа. Төменде Қазбектің оқушыларының 2025 жылғы ҰБТ нәтижелері.",
+                  "От вдохновения — к системной подготовке. Ниже результаты учеников Казбека на ЕНТ 2025.",
+                  "From inspiration to consistent preparation. See Qazbek’s students’ 2025 UNT results below.",
                 )}
               </p>
-              <a href="#enroll" className="gm-text-link">
-                {t("Бірге бастайық", "Начнём вместе", "Let's begin together")}
-                <ArrowUpRight size={17} />
+              <a href="#results" className="gm-text-link">
+                {t(
+                  "Нәтижелерді көру",
+                  "Посмотреть результаты",
+                  "See the results",
+                )}{" "}
+                <ArrowDown size={17} />
               </a>
             </article>
           </div>
+        </section>
+
+        <section id="results" className="gm-section gm-container">
+          <div className="gm-section-heading" data-reveal>
+            <div>
+              <span className="gm-eyebrow">
+                {t(
+                  "ОҚУШЫЛАР НӘТИЖЕСІ / ҰБТ 2025",
+                  "РЕЗУЛЬТАТЫ УЧЕНИКОВ / ЕНТ 2025",
+                  "STUDENT RESULTS / UNT 2025",
+                )}
+              </span>
+              <h2>
+                {t("Еңбектің", "Результат", "Consistent effort.")}{" "}
+                <span>
+                  {t("нақты нәтижесі.", "подготовки.", "Real results.")}
+                </span>
+              </h2>
+            </div>
+            <p>
+              {t(
+                "Қазбектің оқушылары. Мұғалім ұсынған ҰБТ құжаттарындағы балдар.",
+                "Ученики Казбека. Баллы из предоставленных преподавателем документов ЕНТ.",
+                "Qazbek’s students. Scores from UNT documents provided by their teacher.",
+              )}
+            </p>
+          </div>
+          <div className="gm-results-grid">
+            {[
+              { name: "Әсемгүл", math: 50, total: 134, date: "29.05.2025" },
+              { name: "Нұрахмет", math: 45, total: 125, date: "30.05.2025" },
+              { name: "Нұртас", math: 46, total: 123, date: "24.06.2025" },
+              { name: "Сұлтан", math: 42, total: 111, date: "02.06.2025" },
+            ].map((result) => (
+              <article key={result.name} className="gm-result-card" data-reveal>
+                <div className="gm-card-top">
+                  <span className="gm-tag">
+                    {t("МАТЕМАТИКА", "МАТЕМАТИКА", "MATHEMATICS")}
+                  </span>
+                  <GraduationCap size={20} />
+                </div>
+                <div className="gm-result-score">
+                  {result.math}
+                  <span>/50</span>
+                </div>
+                <h3>{result.name}</h3>
+                <p>
+                  {t("Жалпы балл", "Общий балл", "Total score")}{" "}
+                  <strong>{result.total}/140</strong>
+                </p>
+                <span className="gm-result-date">{result.date} · ҰБТ</span>
+              </article>
+            ))}
+          </div>
+          <p className="gm-result-note">
+            {t(
+              "Бұл — жеке оқушылардың нәтижелері. Сенің нәтижең бастапқы дайындық пен тұрақты еңбегіңе байланысты.",
+              "Это индивидуальные результаты. Твой результат зависит от начальной подготовки и регулярной работы.",
+              "These are individual results. Your outcome depends on your starting level and consistent practice.",
+            )}
+          </p>
         </section>
 
         <section id="pricing" className="gm-section gm-pricing-section">

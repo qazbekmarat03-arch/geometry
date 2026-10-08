@@ -210,7 +210,9 @@ for (const [name, options, status] of [
   ],
 ]) {
   test(name, async () => {
-    const access = await getAccountAccess(client(options));
+    const access = await getAccountAccess(client(options), {
+      claimOnLogin: true,
+    });
     assert.equal(access.status, status);
     assert.equal(
       accessDestination(access),
@@ -224,3 +226,26 @@ for (const [name, options, status] of [
     if (status !== "signed-out") assert.equal(access.user.id, user.id);
   });
 }
+
+for (const [name, options, expected] of [
+  ["active owner", { identity: owner, profileRow: ownerProfile }, "admin"],
+  ["active student", { grants: [grant] }, "student"],
+  ["revoked student", { grants: [] }, "denied"],
+  [
+    "deactivated owner",
+    { identity: owner, profileRow: { ...ownerProfile, is_active: false } },
+    "denied",
+  ],
+  [
+    "expired student",
+    { grants: [{ ...grant, expires_at: "2020-01-01T00:00:00Z" }] },
+    "denied",
+  ],
+])
+  test(`page checks ${name} without claiming invitations`, async () => {
+    const db = client(options);
+    db.rpc = () => {
+      throw new Error("Page requests must not write claims");
+    };
+    assert.equal((await getAccountAccess(db)).status, expected);
+  });

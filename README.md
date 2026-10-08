@@ -137,3 +137,16 @@ Teacher portrait: `public/images/qazbek.png`, displayed with Next Image. Replace
 The deployed site is `https://geometry-sigma.vercel.app`. GitHub stores source code; ignored `.env.local` values do not transfer to Vercel. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the Vercel project environment before rebuilding/redeploying. These public settings must reference the same Supabase project as the applied migrations. Google client secrets belong only in Supabase, never in public variables.
 
 In Supabase Authentication → URL Configuration, production requires Site URL `https://geometry-sigma.vercel.app` and the exact allowed redirect `https://geometry-sigma.vercel.app/auth/callback`. Keep `http://localhost:3000/auth/callback` for development. Do not allow all Vercel domains via a wildcard. Google Cloud keeps the Supabase `/auth/v1/callback` URI; the browser-facing app callback is configured in Supabase. A disabled Google button means the deployed app is missing its Supabase configuration, not that Google must be bypassed.
+
+
+## Google Drive homework import
+
+Admin → lesson editor → Homework → Google Drive link. Paste a PDF file link (`drive.google.com/file/d/…/view` or `/open?id=…`) and optionally give it a name. Temporarily enable viewer/download access for anyone with the link in Drive. The server validates Google-only redirects, limits the download to 10 MiB/20 seconds, checks the PDF header and copies the bytes into the existing private homework bucket. Google Docs/folders, HTML confirmation pages and restricted files are rejected. A failed import preserves the old homework.
+
+After saving, Drive sharing can be closed again. Students receive only the platform's short-lived authorized Storage URLs; they never receive the original Drive link. Drive edits are not synced: import the updated file again. `SUPABASE_SERVICE_ROLE_KEY` remains required **server-side only** for student PDF signing, as for ordinary file uploads. No new migration is needed.
+
+## Request latency
+
+Invitation/owner claims run only at the verified OAuth callback. Protected requests still check the authenticated identity, current profile and active/unexpired grant on every request. No permission results are cached across users or requests. A lesson page loads only its own course curriculum, rather than every enrolled course. `vercel.json` puts server functions in `bom1`, alongside the Supabase Mumbai database; update this if the database moves. Decorative WebGL remains isolated to the public landing page.
+
+Landing result cards transcribe teacher-provided 2025 UNT scores using first names only; original documents with personal identifiers and QR codes are not published. No fabricated student quotations are included.

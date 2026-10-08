@@ -16,7 +16,7 @@ export default async function CoursePage({
   const { lesson: lessonId } = await searchParams;
   if (!validId(courseId) || (lessonId !== undefined && !validId(lessonId)))
     notFound();
-  const data = await getDashboardData();
+  const data = await getDashboardData(courseId);
   const course = data.courses.find((course) => course.id === courseId);
   if (!course) notFound();
   const selected = lessonId

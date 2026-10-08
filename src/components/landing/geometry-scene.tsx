@@ -46,7 +46,7 @@ export default function GeometryScene({
     element.dataset.ready = "true";
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 60);
-    camera.position.set(0, 0.2, variant === "hero" ? 9.8 : 7.5);
+    camera.position.set(0, 0.2, variant === "hero" ? 9.8 : 9);
     scene.add(new THREE.AmbientLight(0xc2ffe4, 2.2));
     const key = new THREE.DirectionalLight(0xe0fff4, 5);
     key.position.set(3, 5, 4);

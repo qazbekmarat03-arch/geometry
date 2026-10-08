@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const access = await getAccountAccess(supabase);
+      const access = await getAccountAccess(supabase, { claimOnLogin: true });
       const response = NextResponse.redirect(
         new URL(accessDestination(access), request.url),
       );

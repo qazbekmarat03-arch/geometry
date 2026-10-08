@@ -452,3 +452,25 @@ html.lenis { scroll-behavior: auto !important; }
 .gm-teacher-photo img { display: block; width: 100%; height: auto; }
 
 .gm-eyebrow, .gm-tag { font-family: var(--font-inter), sans-serif; }
+
+.gm-results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.gm-result-card { padding: 28px; border: 1px solid var(--gm-line); border-radius: 28px; background: var(--gm-panel); }
+.gm-result-card:first-child { background: linear-gradient(145deg, #14b87a22, transparent); border-color: #2ee59d66; }
+.gm-result-score { font: 600 clamp(44px, 5vw, 72px)/1.2 var(--font-heading); color: var(--gm-text); margin: 34px 0 22px; letter-spacing: -.06em; }
+.gm-result-score > span { font-size: 22px; color: var(--gm-muted); letter-spacing: 0; }
+.gm-result-card h3 { font-size: 22px; margin-bottom: 16px; }
+.gm-result-card p { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--gm-muted); }
+.gm-result-date, .gm-result-note { display: block; margin-top: 20px; font-size: 12px; line-height: 1.7; color: var(--gm-muted); }
+.gm-challenge { margin-bottom: 30px; padding-bottom: 28px; border-bottom: 1px solid var(--gm-line); }
+.gm-challenge h3 { font-size: clamp(21px, 2vw, 29px); line-height: 1.35; }
+.gm-challenge p { color: var(--gm-muted); font-size: 13px; line-height: 1.7; margin-top: 12px; }
+.gm-challenge-answers { display: flex; gap: 10px; margin-top: 18px; }
+.gm-challenge-answers button { flex: 1; padding: 14px 8px; border: 1px solid #2ee59d55; border-radius: 14px; font-weight: 600; }
+.gm-challenge-answers button:hover, .gm-challenge-answers button[aria-pressed=true] { color: #06130e; background: #2ee59d; }
+.gm-challenge-feedback { padding: 18px; border-radius: 16px; background: #14b87a15; margin-top: 16px; }
+.gm-challenge-feedback .gm-text-link { margin-top: 14px; }
+@media (max-width: 1000px) { .gm-results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .gm-result-card { padding: 20px; } .gm-result-card .gm-tag { font-size: 8px; } .gm-result-card .gm-card-top svg { display: none; } .gm-result-card p { flex-direction: column; gap: 4px; } .gm-result-card h3 { font-size: 18px; } }
+
+.gm-lab-canvas { height: 560px; min-height: 0; align-self: start; position: sticky; top: 24px; }
+@media (max-width: 900px) { .gm-lab-canvas { position: relative; top: auto; height: 360px; } }
