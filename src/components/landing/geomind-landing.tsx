@@ -98,9 +98,9 @@ function FreeLesson({ language }: { language: Language }) {
         </h3>
         <p>
           {t(
-            "Курстың қалай өтетінін өзің көр. Қазбекпен бірге бұрыштар тақырыбын түсініп, алғашқы қадамыңды жаса. Тіркелу қажет емес.",
-            "Посмотри, как проходят занятия. Разбери тему углов с Казбеком — без регистрации.",
-            "Experience a lesson with Qazbek. Explore angles and take your first step, without signing up.",
+            "Курстың қалай өтетінін өзің көр. Қазбек ағаймен бірге бұрыштар тақырыбын түсініп, алғашқы қадамыңды жаса. Тіркелу қажет емес.",
+            "Посмотри, как проходят занятия. Разбери тему углов с Казбек агаем — без регистрации.",
+            "Experience a lesson with Qazbek agai. Explore angles and take your first step, without signing up.",
           )}
         </p>
         <a
@@ -824,7 +824,7 @@ export function DURYSTAPLanding() {
               <div className="gm-teacher-photo">
                 <Image
                   src="/images/qazbek.png"
-                  alt="Қазбек — геометрия курсының мұғалімі"
+                  alt="Қазбек ағай — геометрия курсының мұғалімі"
                   width={500}
                   height={500}
                   sizes="(max-width: 600px) 240px, 180px"
@@ -834,7 +834,7 @@ export function DURYSTAPLanding() {
                 <span className="gm-eyebrow">
                   {t("КУРС МҰҒАЛІМДЕРІ", "ПРЕПОДАВАТЕЛИ", "YOUR TEACHERS")}
                 </span>
-                <h3>{t("Қазбек", "Казбек", "Qazbek")}</h3>
+                <h3>{t("Қазбек ағай", "Казбек агай", "Qazbek agai")}</h3>
                 <p>
                   {t(
                     "SDU университетінде математика мұғалімдігі бойынша бакалавр мен магистратураны аяқтағанмын. 5 000-нан астам оқушы оқыттым.",
@@ -876,9 +876,9 @@ export function DURYSTAPLanding() {
               </h3>
               <p>
                 {t(
-                  "Бір күндік шабыттан — жүйелі дайындыққа. Төменде Қазбектің оқушыларының 2025 жылғы ҰБТ нәтижелері.",
-                  "От вдохновения — к системной подготовке. Ниже результаты учеников Казбека на ЕНТ 2025.",
-                  "From inspiration to consistent preparation. See Qazbek’s students’ 2025 UNT results below.",
+                  "Бір күндік шабыттан — жүйелі дайындыққа. Төменде Қазбек ағайдың оқушыларының 2025 жылғы ҰБТ нәтижелері.",
+                  "От вдохновения — к системной подготовке. Ниже результаты учеников Казбек агая на ЕНТ 2025.",
+                  "From inspiration to consistent preparation. See Qazbek agai’s students’ 2025 UNT results below.",
                 )}
               </p>
               <a href="#results" className="gm-text-link">
@@ -912,9 +912,9 @@ export function DURYSTAPLanding() {
             </div>
             <p>
               {t(
-                "Қазбектің оқушылары. Мұғалім ұсынған ҰБТ құжаттарындағы балдар.",
-                "Ученики Казбека. Баллы из предоставленных преподавателем документов ЕНТ.",
-                "Qazbek’s students. Scores from UNT documents provided by their teacher.",
+                "Қазбек ағайдың оқушылары. Мұғалім ұсынған ҰБТ құжаттарындағы балдар.",
+                "Ученики Казбек агая. Баллы из предоставленных преподавателем документов ЕНТ.",
+                "Qazbek agai’s students. Scores from UNT documents provided by their teacher.",
               )}
             </p>
           </div>
