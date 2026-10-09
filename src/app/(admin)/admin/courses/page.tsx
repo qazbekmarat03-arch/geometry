@@ -1,5 +1,5 @@
 import { PageHeading } from "@/components/layout/page-heading";
-import { CourseArtwork } from "@/components/course/course-artwork";
+import { CourseThumbnail } from "@/components/dashboard/course-thumbnail";
 import { requireAdmin } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -24,7 +24,7 @@ export default async function CoursesPage({
   const db = await createClient();
   const { data, error, count } = await db
     .from("courses")
-    .select("id,title,description,is_published", { count: "exact" })
+    .select("id,title,description,is_published,thumbnail_url", { count: "exact" })
     .order("created_at", { ascending: false })
     .order("id")
     .range((page - 1) * 20, page * 20 - 1);
@@ -46,12 +46,7 @@ export default async function CoursesPage({
         <div className="course-gallery">
           {data.map((course) => (
             <Card key={course.id} className="course-tile !p-0">
-              <div className="course-art relative overflow-hidden rounded-[20px] bg-[#123b2d] p-8">
-                <CourseArtwork className="mx-auto h-48 w-full" />
-                <span className="absolute bottom-5 left-6 text-[9px] tracking-[.2em] text-muted">
-                  DURYSTAP / GEOMETRY
-                </span>
-              </div>
+              <CourseThumbnail title={course.title} url={course.thumbnail_url} />
               <div className="course-tile-info">
                 <Badge>{course.is_published ? "Жарияланған" : "Жоба"}</Badge>
                 <h2 className="mt-4 text-xl font-semibold">{course.title}</h2>

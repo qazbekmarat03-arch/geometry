@@ -62,7 +62,7 @@ export function ContinueLearning({ data }: { data: Dashboard }) {
             <ButtonLink
               href={lessonHref(latest.courseId, latest.id)}
               variant="secondary"
-              className="!border-lime !bg-lime"
+              className="learning-action"
             >
               <Play size={15} fill="currentColor" />
               Жалғастыру <ArrowRight size={16} />
@@ -71,7 +71,7 @@ export function ContinueLearning({ data }: { data: Dashboard }) {
             <ButtonLink
               href="/dashboard/courses"
               variant="secondary"
-              className="!border-lime !bg-lime"
+              className="learning-action"
             >
               Курстарды көру <ArrowRight size={16} />
             </ButtonLink>

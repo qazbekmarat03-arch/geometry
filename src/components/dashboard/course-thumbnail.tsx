@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { CourseArtwork } from "@/components/course/course-artwork";
+import { CourseCover } from "@/components/course/course-cover";
 export function CourseThumbnail({
   url,
   title,
@@ -26,12 +26,7 @@ export function CourseThumbnail({
           onError={() => setFailed(true)}
         />
       ) : (
-        <>
-          <CourseArtwork className="absolute h-full w-full" />
-          <span className="absolute left-6 top-5 text-[9px] tracking-[.16em] text-brand">
-            ВИДЕО КУРС / GEOMETRY
-          </span>
-        </>
+        <CourseCover title={title} />
       )}
     </div>
   );
