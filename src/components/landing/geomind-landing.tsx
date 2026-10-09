@@ -4,7 +4,7 @@ import Image from "next/image";
 import { BrandMark } from "@/components/layout/brand-mark";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -12,7 +12,6 @@ import {
   BookOpen,
   Box,
   Check,
-  Circle,
   FileText,
   Globe2,
   GraduationCap,
@@ -23,13 +22,11 @@ import {
   Pause,
   Play,
   Plus,
-  Rotate3D,
   Sparkles,
   Sun,
   Triangle,
   X,
 } from "lucide-react";
-import type { Solid } from "./geometry-scene";
 import { LandingMotion } from "./landing-motion";
 import { courseProgram } from "./course-program";
 
@@ -59,292 +56,62 @@ function Brand() {
   );
 }
 
-function Lab({ language, paused }: { language: Language; paused: boolean }) {
+function FreeLesson({ language }: { language: Language }) {
   const t = copy(language);
-  const [solid, setSolid] = useState<Solid>("cube");
-  const [size, setSize] = useState(2);
-  const [challenge, setChallenge] = useState(0);
-  const [answer, setAnswer] = useState<number | null>(null);
-  const challenges = [
-    {
-      question: t(
-        "Кубтың қырын 2 есе ұзартсақ, көлемі неше есе өседі?",
-        "Во сколько раз вырастет объём куба, если удвоить ребро?",
-        "Double a cube’s edge. How much does its volume grow?",
-      ),
-      choices: [2, 4, 8],
-      correct: 8,
-      size: 4,
-      explanation: "2³ = 8 → 4³ = 64. 64 ÷ 8 = 8",
-      unit: t("есе", "раз", "times"),
-    },
-    {
-      question: t(
-        "Ал сол кубтың бетінің ауданы неше есе өседі?",
-        "А во сколько раз вырастет площадь поверхности?",
-        "How much does its surface area grow?",
-      ),
-      choices: [2, 4, 8],
-      correct: 4,
-      size: 4,
-      explanation: "6 × 2² = 24 → 6 × 4² = 96. 96 ÷ 24 = 4",
-      unit: t("есе", "раз", "times"),
-    },
-    {
-      question: t(
-        "Көлемі 27 см³ кубтың қырын тап.",
-        "Найди ребро куба объёмом 27 см³.",
-        "Find the edge of a cube with volume 27 cm³.",
-      ),
-      choices: [3, 6, 9],
-      correct: 3,
-      size: 3,
-      explanation: "V = a³ → a = ∛27 = 3 см",
-      unit: t("см", "см", "cm"),
-    },
-  ];
-  const task = challenges[challenge];
-  const [visible, setVisible] = useState(false);
-  const panel = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    if (panel.current) observer.observe(panel.current);
-    return () => observer.disconnect();
-  }, []);
-  const area =
-    solid === "cube"
-      ? 6 * size ** 2
-      : solid === "sphere"
-        ? 4 * Math.PI * size ** 2
-        : Math.sqrt(3) * size ** 2;
-  const volume =
-    solid === "cube"
-      ? size ** 3
-      : solid === "sphere"
-        ? (4 / 3) * Math.PI * size ** 3
-        : size ** 3 / (6 * Math.sqrt(2));
-  const label =
-    solid === "sphere"
-      ? t("Радиус", "Радиус", "Radius")
-      : t("Қыр ұзындығы", "Длина ребра", "Edge length");
-  const format = (value: number) =>
-    new Intl.NumberFormat(language === "kk" ? "kk-KZ" : language, {
-      maximumFractionDigits: 2,
-    }).format(value);
+  const [playing, setPlaying] = useState(false);
   return (
-    <div className="gm-lab-panel" ref={panel}>
-      <div className="gm-lab-canvas">
-        <div className="gm-canvas-tag">
-          <span className="gm-live-dot" />
-          {t(
-            "ИНТЕРАКТИВТІ КЕҢІСТІК",
-            "ИНТЕРАКТИВНОЕ ПРОСТРАНСТВО",
-            "INTERACTIVE SPACE",
-          )}
-        </div>
-        {visible && (
-          <GeometryScene
-            variant="lab"
-            solid={solid}
-            size={size}
-            paused={paused}
+    <div className="gm-free-lesson">
+      <div className="gm-free-video">
+        {playing ? (
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/UdFm-e6bwIc?autoplay=1&rel=0"
+            title="Бұрыштар — тегін сабақ"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
           />
+        ) : (
+          <button className="gm-free-play" onClick={() => setPlaying(true)}>
+            <span className="gm-free-angle" aria-hidden="true">
+              ∠
+            </span>
+            <span className="gm-play-circle">
+              <Play size={24} fill="currentColor" />
+            </span>
+            <strong>{t("Бұрыштар", "Углы", "Angles")}</strong>
+            <span>
+              {t(
+                "Тегін сабақты көру",
+                "Смотреть бесплатный урок",
+                "Watch the free lesson",
+              )}
+            </span>
+          </button>
         )}
-        <div className="gm-axis" aria-hidden="true">
-          <span>Y</span>
-          <i />
-          <b>X</b>
-          <em>Z</em>
-        </div>
-        <div className="gm-canvas-note">
-          <Rotate3D size={14} />
-          {t(
-            "Өлшемін өзгерт. Байланысты байқа.",
-            "Меняй размер. Замечай связи.",
-            "Change the size. See the connection.",
-          )}
-        </div>
       </div>
-      <div className="gm-lab-controls">
-        <div className="gm-challenge">
-          <span className="gm-eyebrow">
-            {t("3 ҚАДАМДЫ ЧЕЛЛЕНДЖ", "ЧЕЛЛЕНДЖ В 3 ШАГА", "3-STEP CHALLENGE")} ·{" "}
-            {challenge + 1}/3
-          </span>
-          <h3>{task.question}</h3>
-          <p>
-            {t(
-              "Алдымен болжам жаса. Сосын 3D фигурамен тексер.",
-              "Сначала предположи. Потом проверь на 3D-фигуре.",
-              "Make a prediction. Then check it in 3D.",
-            )}
-          </p>
-          <div
-            className="gm-challenge-answers"
-            role="group"
-            aria-label={t("Жауабың", "Твой ответ", "Your answer")}
-          >
-            {task.choices.map((choice) => (
-              <button
-                key={choice}
-                type="button"
-                aria-pressed={answer === choice}
-                onClick={() => {
-                  setAnswer(choice);
-                  setSolid("cube");
-                  setSize(task.size);
-                }}
-              >
-                {choice} {task.unit}
-              </button>
-            ))}
-          </div>
-          {answer !== null && (
-            <div className="gm-challenge-feedback" role="status">
-              <strong>
-                {answer === task.correct
-                  ? t("Дұрыс!", "Верно!", "Correct!")
-                  : t(
-                      "Бірге тексерейік.",
-                      "Давай проверим.",
-                      "Let’s check together.",
-                    )}
-              </strong>
-              <p>{task.explanation}</p>
-              <button
-                type="button"
-                className="gm-text-link"
-                onClick={() => {
-                  setChallenge((challenge + 1) % 3);
-                  setAnswer(null);
-                  setSolid("cube");
-                  setSize(2);
-                }}
-              >
-                {challenge === 2
-                  ? t("Қайта байқап көр", "Попробовать снова", "Try again")
-                  : t(
-                      "Келесі тапсырма",
-                      "Следующее задание",
-                      "Next challenge",
-                    )}{" "}
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          )}
-        </div>
-        <span className="gm-eyebrow">
-          {t("ӨЗІҢ ЗЕРТТЕ", "ИССЛЕДУЙ", "EXPLORE IT")}
+      <div className="gm-free-copy">
+        <span className="gm-tag">
+          {t("ТЕГІН САБАҚ", "БЕСПЛАТНЫЙ УРОК", "FREE LESSON")}
         </span>
         <h3>
-          {t(
-            "Енді өзің тәжірибе жаса.",
-            "Оживи формулу.",
-            "Bring formulas to life.",
-          )}
+          {t("Бұрыштардан бастайық.", "Начнём с углов.", "Start with angles.")}
         </h3>
-        <div
-          className="gm-solid-tabs"
-          role="group"
-          aria-label={t(
-            "Фигураны таңдаңыз",
-            "Выберите фигуру",
-            "Choose a shape",
-          )}
-        >
-          {(
-            [
-              ["cube", Box, t("Куб", "Куб", "Cube")],
-              ["sphere", Circle, t("Шар", "Шар", "Sphere")],
-              [
-                "tetrahedron",
-                Triangle,
-                t("Тетраэдр", "Тетраэдр", "Tetrahedron"),
-              ],
-            ] as const
-          ).map(([value, Icon, name]) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={solid === value}
-              onClick={() => setSolid(value)}
-            >
-              <Icon size={17} />
-              {name}
-            </button>
-          ))}
-        </div>
-        <div className="gm-range-label">
-          <label htmlFor="edge-size">{label}</label>
-          <output htmlFor="edge-size">
-            {format(size)} {t("см", "см", "cm")}
-          </output>
-        </div>
-        <input
-          id="edge-size"
-          type="range"
-          min="1"
-          max="5"
-          step=".1"
-          value={size}
-          onChange={(e) => setSize(Number(e.target.value))}
-        />
-        <div className="gm-range-limits">
-          <span>1 {t("см", "см", "cm")}</span>
-          <span>5 {t("см", "см", "cm")}</span>
-        </div>
-        <div
-          className="gm-formula-results"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <div>
-            <span>
-              {t("Бетінің ауданы", "Площадь поверхности", "Surface area")}
-            </span>
-            <strong>
-              {format(area)}
-              <small> {t("см²", "см²", "cm²")}</small>
-            </strong>
-            <code>
-              {solid === "cube"
-                ? "S = 6a²"
-                : solid === "sphere"
-                  ? "S = 4πr²"
-                  : "S = √3a²"}
-            </code>
-          </div>
-          <div>
-            <span>{t("Көлемі", "Объём", "Volume")}</span>
-            <strong>
-              {format(volume)}
-              <small> {t("см³", "см³", "cm³")}</small>
-            </strong>
-            <code>
-              {solid === "cube"
-                ? "V = a³"
-                : solid === "sphere"
-                  ? "V = ⁴⁄₃πr³"
-                  : "V = a³ / (6√2)"}
-            </code>
-          </div>
-        </div>
-        <p className="gm-lab-tip">
-          <Sparkles size={16} />
+        <p>
           {t(
-            "Қырды 2 есе арттырсаң, көлем 8 есе өседі. Тексеріп көр!",
-            "Увеличь размер в 2 раза — объём вырастет в 8. Проверь!",
-            "Double the size and the volume grows eightfold. Try it!",
+            "Курстың қалай өтетінін өзің көр. Қазбекпен бірге бұрыштар тақырыбын түсініп, алғашқы қадамыңды жаса. Тіркелу қажет емес.",
+            "Посмотри, как проходят занятия. Разбери тему углов с Казбеком — без регистрации.",
+            "Experience a lesson with Qazbek. Explore angles and take your first step, without signing up.",
           )}
         </p>
+        <a
+          className="gm-text-link"
+          href="https://www.youtube.com/watch?v=UdFm-e6bwIc"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t("YouTube-та ашу", "Открыть на YouTube", "Open on YouTube")}{" "}
+          <ArrowUpRight size={16} />
+        </a>
       </div>
     </div>
   );
@@ -456,7 +223,7 @@ export function DURYSTAPLanding() {
   const nav = [
     ["#why", t("Артықшылықтар", "Преимущества", "Why DURYSTAP")],
     ["#program", t("Бағдарлама", "Программа", "Curriculum")],
-    ["#lab", "3D " + t("зертхана", "лаборатория", "lab")],
+    ["#free-lesson", t("Тегін сабақ", "Бесплатный урок", "Free lesson")],
     ["#pricing", t("Бағасы", "Стоимость", "Pricing")],
   ];
   return (
@@ -554,9 +321,9 @@ export function DURYSTAPLanding() {
               )}
               <br />
               {t(
-                "Геометрияны 3D, видео және практика арқылы түсініп үйрен.",
-                "Пойми геометрию через 3D, видео и практику.",
-                "Understand geometry through 3D, video and practice.",
+                "Геометрияны видео сабақтар мен практика арқылы түсініп үйрен.",
+                "Пойми геометрию через видеоуроки и практику.",
+                "Understand geometry through video lessons and practice.",
               )}
             </p>
             <div className="gm-hero-buttons">
@@ -568,11 +335,15 @@ export function DURYSTAPLanding() {
                 {t("Оқуды бастау", "Начать учиться", "Start learning")}
                 <ArrowUpRight size={19} />
               </a>
-              <a className="gm-button gm-button-ghost" href="#lab">
+              <a className="gm-button gm-button-ghost" href="#free-lesson">
                 <span className="gm-play-circle">
                   <Play size={12} fill="currentColor" />
                 </span>
-                {t("3D-ді байқап көр", "Попробовать 3D", "Explore in 3D")}
+                {t(
+                  "Тегін сабақты көру",
+                  "Бесплатный урок",
+                  "Watch a free lesson",
+                )}
               </a>
             </div>
             <div className="gm-hero-benefits">
@@ -671,11 +442,11 @@ export function DURYSTAPLanding() {
                 t("негізгі бөлім", "основных раздела", "core sections"),
               ],
               [
-                "3",
+                "1",
                 t(
-                  "өлшемді зертхана",
-                  "измерения в лаборатории",
-                  "dimensions to explore",
+                  "ашық видео сабақ",
+                  "открытый видеоурок",
+                  "free video lesson",
                 ),
               ],
               [
@@ -698,7 +469,7 @@ export function DURYSTAPLanding() {
               <div key={title} className="gm-stat">
                 <strong>
                   <span data-count={n}>{n.padStart(2, "0")}</span>
-                  <span>{i === 1 ? "D" : i === 3 ? "%" : ""}</span>
+                  <span>{i === 3 ? "%" : ""}</span>
                 </strong>
                 <p>{title}</p>
               </div>
@@ -790,8 +561,8 @@ export function DURYSTAPLanding() {
                   "Go beyond flat diagrams. Explore shapes from every angle.",
                 )}
               </p>
-              <a className="gm-text-link" href="#lab">
-                {t("Зертханаға өту", "Открыть лабораторию", "Enter the lab")}
+              <a className="gm-text-link" href="#free-lesson">
+                {t("Сабақты көру", "Смотреть урок", "Watch the lesson")}
                 <ArrowUpRight size={16} />
               </a>
             </article>
@@ -1003,26 +774,25 @@ export function DURYSTAPLanding() {
           </div>
         </section>
 
-        <section id="lab" className="gm-section gm-container">
+        <section id="free-lesson" className="gm-section gm-container">
           <div className="gm-section-heading" data-reveal>
             <div>
               <span className="gm-eyebrow">
-                03 / {t("3D ЗЕРТХАНА", "3D ЛАБОРАТОРИЯ", "THE 3D LAB")}
+                03 / {t("ТЕГІН САБАҚ", "БЕСПЛАТНЫЙ УРОК", "FREE LESSON")}
               </span>
               <h2>
-                {t("Жай оқыма.", "Не просто читай.", "Don't just read.")}{" "}
-                <span>{t("Байқап көр.", "Попробуй.", "Try it.")}</span>
+                {t("Алдымен көр.", "Сначала посмотри.", "Try a lesson.")}{" "}
+                <span>
+                  {t(
+                    "Түсініп баста.",
+                    "Начни с понимания.",
+                    "Start understanding.",
+                  )}
+                </span>
               </h2>
             </div>
-            <p>
-              {t(
-                "Интуицияңды тексер: қыр 2 есе артса, көлем де 2 есе өсе ме? Жауапты таңда, фигураны өзгерт, айырмашылықты өзің көр.",
-                "Геометрия — не только на бумаге. Измени размер и посмотри, как изменится фигура.",
-                "Geometry lives beyond the page. Change one dimension and watch the whole shape respond.",
-              )}
-            </p>
           </div>
-          <Lab language={language} paused={paused} />
+          <FreeLesson language={language} />
         </section>
 
         <section className="gm-section gm-container gm-people" id="teachers">
@@ -1148,30 +918,118 @@ export function DURYSTAPLanding() {
               )}
             </p>
           </div>
-          <div className="gm-results-grid">
+          <div className="gm-certificates">
             {[
-              { name: "Әсемгүл", math: 50, total: 134, date: "29.05.2025" },
-              { name: "Нұрахмет", math: 45, total: 125, date: "30.05.2025" },
-              { name: "Нұртас", math: 46, total: 123, date: "24.06.2025" },
-              { name: "Сұлтан", math: 42, total: 111, date: "03.06.2025" },
+              {
+                name: "Сапарғалиева Әсемгүл Тұрсынқызы",
+                scores: [18, 10, 10, 50, 46],
+                total: 134,
+                date: "29.05.2025",
+                elective: "Физика",
+              },
+              {
+                name: "Оразбахов Нұрахмет Шахымханұлы",
+                scores: [17, 9, 9, 45, 45],
+                total: 125,
+                date: "30.05.2025",
+                elective: "Физика",
+              },
+              {
+                name: "Әнебаев Нұртас Бекболұлы",
+                scores: [19, 8, 9, 46, 41],
+                total: 123,
+                date: "24.06.2025",
+                elective: "Физика",
+              },
+              {
+                name: "Рысбек Сұлтан Жандосұлы",
+                scores: [12, 9, 9, 42, 39],
+                total: 111,
+                date: "03.06.2025",
+                elective: "География",
+              },
             ].map((result) => (
-              <article key={result.name} className="gm-result-card" data-reveal>
+              <article key={result.name} className="gm-certificate" data-reveal>
                 <div className="gm-card-top">
-                  <span className="gm-tag">
-                    {t("МАТЕМАТИКА", "МАТЕМАТИКА", "MATHEMATICS")}
-                  </span>
-                  <GraduationCap size={20} />
-                </div>
-                <div className="gm-result-score">
-                  {result.math}
-                  <span>/50</span>
+                  <span className="gm-tag">ҰБТ · 2025</span>
+                  <GraduationCap size={24} />
                 </div>
                 <h3>{result.name}</h3>
-                <p>
-                  {t("Жалпы балл", "Общий балл", "Total score")}{" "}
-                  <strong>{result.total}/140</strong>
+                <p className="gm-certificate-meta">
+                  {result.date} ·{" "}
+                  {t(
+                    "Тестілеу тілі: қазақша",
+                    "Язык тестирования: казахский",
+                    "Test language: Kazakh",
+                  )}
                 </p>
-                <span className="gm-result-date">{result.date} · ҰБТ</span>
+                <table>
+                  <caption>
+                    {t(
+                      "ҰТО құжатындағы нәтижелер",
+                      "Результаты из документа НЦТ",
+                      "Scores from the NTC document",
+                    )}
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("Пән", "Предмет", "Subject")}</th>
+                      <th scope="col">{t("Балл", "Балл", "Score")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      t(
+                        "Қазақстан тарихы",
+                        "История Казахстана",
+                        "History of Kazakhstan",
+                      ),
+                      t(
+                        "Оқу сауаттылығы",
+                        "Грамотность чтения",
+                        "Reading literacy",
+                      ),
+                      t(
+                        "Математикалық сауаттылық",
+                        "Математическая грамотность",
+                        "Mathematical literacy",
+                      ),
+                      t("Математика", "Математика", "Mathematics"),
+                      result.elective === "Физика"
+                        ? t("Физика", "Физика", "Physics")
+                        : t("География", "География", "Geography"),
+                    ].map((subject, i) => (
+                      <tr
+                        key={subject}
+                        className={i === 3 ? "gm-certificate-math" : undefined}
+                      >
+                        <th scope="row">{subject}</th>
+                        <td>
+                          {result.scores[i]}{" "}
+                          <span>/ {i === 0 ? 20 : i < 3 ? 10 : 50}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th scope="row">
+                        {t("Жалпы нәтиже", "Общий результат", "Total score")}
+                      </th>
+                      <td>
+                        {result.total}
+                        <span> / 140</span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+                <p className="gm-certificate-source">
+                  {t(
+                    "ҰТО нәтижелерінен алынған мәлімет. Ресми сертификаттың орнына жүрмейді.",
+                    "Данные из результатов НЦТ. Не заменяет официальный сертификат.",
+                    "Transcribed NTC results. Not a replacement for the official certificate.",
+                  )}
+                </p>
               </article>
             ))}
           </div>
