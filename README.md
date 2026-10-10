@@ -161,3 +161,10 @@ Apply migration `20261009001300_lesson_quizzes.sql` before deploying. In the adm
 Quiz lessons require strictly more than 80% (41/50) to complete and unlock later published lessons, including in freely navigable courses. PDF-only lessons retain normal completion behavior. Correct answers persist; retries contain only remaining questions. Solutions become visible after two wrong attempts on that question. Students may continue retrying after passing. Changing the test or mode invalidates old results and resets completion when a quiz is required. Answer keys/source are admin-only; grading, prerequisites and completion guards are enforced in PostgreSQL. Do not commit real answer keys: `*.private.tex/json/sql` are ignored.
 
 Run `node scripts/test-quiz-database.mjs` for scoring, retry, expiry, role and prerequisite security checks.
+
+
+### Importing question and solution files
+
+Admin → Courses → lesson → Homework type and quiz. Paste questions and solutions into their separate TeX fields, or select UTF-8 `.tex`/`.txt` files (up to 1 MB each; combined source up to 250,000 characters). A combined file is split automatically; combined pasted code also works when the solutions field is empty. The example in the editor shows the required numbered questions, four options and answer/solution format. Both “жауаптары” and “толық шешу жолдары” section headings are accepted. Level headings are removed from answer options. Preview one question at a time and inspect diagrams before saving. TikZ supports triangle `cycle`, numeric/named/polar coordinates, bounded barycentric coordinates and arcs. It does not execute arbitrary LaTeX packages.
+
+Importer regression checks: `node --experimental-strip-types --test scripts/test-quiz-import.mjs`.
