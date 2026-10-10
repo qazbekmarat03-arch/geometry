@@ -54,7 +54,7 @@ export default async function LessonEditor({
         <Card className="!border-0 !bg-transparent !p-0 !shadow-none">
           <ContentForm kind="lesson" values={lesson} />
         </Card>
-        <Card className="self-start !bg-[#102d21] !shadow-none">
+        <Card className="col-span-full min-w-0 self-start !bg-[#102d21] !shadow-none">
           <QuizEditor lessonId={lesson.id} initialMode={homework.data?.mode ?? "pdf"} initialSource={homework.data?.source ?? ""} />
           <h2 className="mb-5 mt-8 text-xl font-semibold">PDF үй тапсырмасы</h2>
           {lesson.homework_pdf_url && (
