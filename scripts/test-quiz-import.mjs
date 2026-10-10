@@ -43,3 +43,15 @@ test('arc center comes from current point and start angle',()=>{
  const [x,y]=end(direct.paths[0].d);assert.ok(Math.abs(x-200)<1e-8);assert.ok(Math.abs(y+20)<1e-8);
  assert.deepEqual(end(direct.paths[0].d),end(offset.paths[0].d));
 });
+test('answer keys may end solutions without punctuation, with Cyrillic lookalikes',()=>{
+ for(const key of ['B','В']){
+  const solution=String.raw`\section*{Шешімдері мен жауап кілті}\begin{enumerate}\item First explanation. \textbf{Жауабы: `+key+String.raw`}\end{enumerate}`;
+  const [q]=importQuiz(combineQuizSource(questions,solution));
+  assert.equal(q.answer,1);assert.equal(q.solution,'First explanation.');
+ }
+ assert.throws(()=>importQuiz(combineQuizSource(questions,String.raw`\item Explanation. Жауабы: A. Жауабы: B.`)));
+});
+test('midway side labels are placed between segment endpoints',()=>{
+ const d=parseDiagram(String.raw`\draw (2,2) -- (6,4) node[midway,above] {$x$};`);
+ assert.deepEqual(d.labels[0].at,[4,3.3]);
+});

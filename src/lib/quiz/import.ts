@@ -23,7 +23,7 @@ export type QuizView = {
 };
 
 const solutionsHeading =
-  /\\section\*?\{[^}]*(?:жауаптары|шешу жолдары|шығарылу жолдары)[^}]*\}/i;
+  /\\section\*?\{[^}]*(?:жауап(?:тары| кілті)?|шешімдері|шешу жолдары|шығарылу жолдары)[^}]*\}/i;
 export function splitQuizSource(source: string) {
   const boundary = source.search(solutionsHeading);
   return boundary < 0
@@ -68,13 +68,34 @@ export function importQuiz(source: string): QuizQuestion[] {
       "Жауаптар бөлімі қажет: \\section{Үй тапсырмасының жауаптары мен шығарылу жолдары}",
     );
   const chunks = source.slice(0, boundary).split(/\\qnum\{(\d+)\}/);
-  const solutions = [
-    ...source
-      .slice(boundary)
-      .matchAll(
-        /\\item\s+\\textbf\{Жауабы:\s*([ABCD])\.\}([\s\S]*?)(?=\\item|\\end\{enumerate\}|$)/g,
+  const solutionItems = source
+    .slice(boundary)
+    .split(/\\item(?:\s*\[[^\]]*\])?\s*/)
+    .slice(1);
+  const solutions = solutionItems.map((item, index) => {
+    const body = item.split(/\\end\{enumerate\}/)[0];
+    const normalized = body.replace(/\\textbf\{([^{}]*)\}/g, "$1");
+    const keys = [
+      ...normalized.matchAll(
+        /Жауабы\s*:\s*([ABCDАВСД])(?:\s*[.)])?(?![A-Za-zА-Яа-я])/gu,
       ),
-  ];
+    ];
+    if (keys.length !== 1)
+      throw new Error(
+        `${index + 1}-сұрақта бір ғана «Жауабы: A/B/C/D» белгісі болуы керек (шешімнің басында немесе соңында).`,
+      );
+    const key = keys[0];
+    const letter =
+      ({ А: "A", В: "B", С: "C", Д: "D" } as Record<string, string>)[key[1]] ??
+      key[1];
+    const solution = cleanTex(
+      normalized.slice(0, key.index) +
+        normalized.slice(key.index! + key[0].length),
+    );
+    if (!solution)
+      throw new Error(`${index + 1}-сұрақтың шығарылу жолын енгізіңіз.`);
+    return { letter, solution };
+  });
   const questions: QuizQuestion[] = [];
   for (let i = 1; i < chunks.length; i += 2) {
     if (Number(chunks[i]) !== questions.length + 1)
@@ -98,7 +119,7 @@ export function importQuiz(source: string): QuizQuestion[] {
         ),
       ),
     );
-    const solution = cleanTex(answer[2]);
+    const solution = answer.solution;
     if (!prompt || values.some((x) => !x) || !solution)
       throw new Error("Сұрақ, жауап нұсқалары мен шешімі бос болмауы керек.");
     for (const diagram of prompt.matchAll(
@@ -108,7 +129,7 @@ export function importQuiz(source: string): QuizQuestion[] {
     questions.push({
       prompt,
       options: values,
-      answer: "ABCD".indexOf(answer[1]),
+      answer: "ABCD".indexOf(answer.letter),
       solution,
     });
   }

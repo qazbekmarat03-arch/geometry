@@ -68,6 +68,7 @@ export function parseDiagram(source: string): Diagram {
       );
     const style = command[2] ?? "";
     s = s.slice(command[0].length);
+    let previous: Point = [0, 0];
     let current: Point = [0, 0],
       start: Point = [0, 0],
       path = "",
@@ -81,7 +82,11 @@ export function parseDiagram(source: string): Diagram {
           /^node(?:\[([^\]]*)\])?(?:\s+at\s*\(([^)]+)\))?\s*\{(\$[^$]*\$|[^{}]*)\}/,
         ))
       ) {
-        const p = match[2] ? point(match[2]) : current;
+        const p: Point = match[2]
+          ? point(match[2])
+          : (match[1] ?? "").includes("midway")
+            ? [(previous[0] + current[0]) / 2, (previous[1] + current[1]) / 2]
+            : current;
         const align = match[1] ?? "";
         const at: Point = [
           p[0] +
@@ -114,6 +119,7 @@ export function parseDiagram(source: string): Diagram {
           path += `L${xy([current[0], next[1]])} L${xy(next)} `;
         else path += `${operation}${xy(next)} `;
         if (operation === "M") start = next;
+        previous = current;
         current = next;
         points.push(next);
         operation = "M";

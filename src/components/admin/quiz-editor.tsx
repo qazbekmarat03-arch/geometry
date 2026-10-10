@@ -128,7 +128,7 @@ export function QuizEditor({
         <pre className="overflow-auto p-3 text-xs">{example}</pre>
         <p className="text-xs text-muted">
           1–100 сұрақ. Әрқайсысында A–D жауаптары және жауаптар бөлімінде шешімі
-          болсын. $...$ формулалары, қарапайым TikZ: coordinate, draw, path,
+          болсын. «Жауабы: B» шешімнің басында да, соңында да жазыла алады; нүкте міндетті емес. $...$ формулалары, қарапайым TikZ: coordinate, draw, path,
           node, кесінділер мен доғалар қолданылады. Толық TeX бағдарламасы
           орындалмайды.
         </p>
