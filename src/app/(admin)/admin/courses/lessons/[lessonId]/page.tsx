@@ -17,13 +17,20 @@ export default async function LessonEditor({
   const { lessonId } = await params;
   if (!validId(lessonId)) notFound();
   const db = await createClient();
-  const { data, error } = await db
-    .from("lessons")
-    .select(
-      "id,title,description,video_url,duration,is_published,homework_file_name,homework_pdf_url,modules!inner(title,course_id)",
-    )
-    .eq("id", lessonId)
-    .maybeSingle();
+  const [{ data, error }, homework] = await Promise.all([
+    db
+      .from("lessons")
+      .select(
+        "id,title,description,video_url,duration,is_published,homework_file_name,homework_pdf_url,modules!inner(title,course_id)",
+      )
+      .eq("id", lessonId)
+      .maybeSingle(),
+    db
+      .from("lesson_homework")
+      .select("mode,source")
+      .eq("lesson_id", lessonId)
+      .maybeSingle(),
+  ]);
   if (error) throw new Error("Lesson could not be loaded");
   if (!data) notFound();
   const lesson = data as unknown as {
@@ -37,8 +44,7 @@ export default async function LessonEditor({
     homework_pdf_url: string | null;
     modules: { title: string; course_id: string };
   };
-  const homework = await db.from("lesson_homework").select("mode,source").eq("lesson_id",lessonId).maybeSingle();
-  if(homework.error) throw new Error("Homework settings could not be loaded");
+  if (homework.error) throw new Error("Homework settings could not be loaded");
   return (
     <>
       <ButtonLink
@@ -55,7 +61,11 @@ export default async function LessonEditor({
           <ContentForm kind="lesson" values={lesson} />
         </Card>
         <Card className="col-span-full min-w-0 self-start !bg-[#102d21] !shadow-none">
-          <QuizEditor lessonId={lesson.id} initialMode={homework.data?.mode ?? "pdf"} initialSource={homework.data?.source ?? ""} />
+          <QuizEditor
+            lessonId={lesson.id}
+            initialMode={homework.data?.mode ?? "pdf"}
+            initialSource={homework.data?.source ?? ""}
+          />
           <h2 className="mb-5 mt-8 text-xl font-semibold">PDF үй тапсырмасы</h2>
           {lesson.homework_pdf_url && (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

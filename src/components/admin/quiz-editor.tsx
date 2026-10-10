@@ -6,7 +6,11 @@ import {
   combineQuizSource,
   type QuizQuestion,
 } from "@/lib/quiz/import";
-import { QuizText } from "@/components/course/quiz-text";
+import dynamic from "next/dynamic";
+const QuizText = dynamic(
+  () => import("@/components/course/quiz-text").then((m) => m.QuizText),
+  { loading: () => <span>Формула жүктелуде...</span> },
+);
 import { saveHomeworkMode } from "@/app/(admin)/admin/courses/quiz-actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -128,9 +132,10 @@ export function QuizEditor({
         <pre className="overflow-auto p-3 text-xs">{example}</pre>
         <p className="text-xs text-muted">
           1–100 сұрақ. Әрқайсысында A–D жауаптары және жауаптар бөлімінде шешімі
-          болсын. «Жауабы: B» шешімнің басында да, соңында да жазыла алады; нүкте міндетті емес. $...$ формулалары, қарапайым TikZ: coordinate, draw, path,
-          node, кесінділер мен доғалар қолданылады. Толық TeX бағдарламасы
-          орындалмайды.
+          болсын. «Жауабы: B» шешімнің басында да, соңында да жазыла алады;
+          нүкте міндетті емес. $...$ формулалары, қарапайым TikZ: coordinate,
+          draw, path, node, кесінділер мен доғалар қолданылады. Толық TeX
+          бағдарламасы орындалмайды.
         </p>
       </details>
       <label className="mb-3 block text-sm">
