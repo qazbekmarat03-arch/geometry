@@ -152,3 +152,12 @@ Invitation/owner claims run only at the verified OAuth callback. Protected reque
 Landing result cards transcribe teacher-provided 2025 UNT scores using first names only; original documents with personal identifiers and QR codes are not published. No fabricated student quotations are included.
 
 Display/body fonts ship as WOFF2 subsets covering Latin, Cyrillic (including all Kazakh letters), punctuation and common mathematical symbols. Original font licenses remain in `public/fonts`.
+
+
+## Native quiz homework
+
+Apply migration `20261009001300_lesson_quizzes.sql` before deploying. In the admin lesson editor choose PDF, quiz, or both. Paste the bounded TeX format shown in the editor, preview, then save. Supports 1–100 numbered questions, four A–D options, one answer and a worked solution for each. Math is rendered with KaTeX; the supported declarative TikZ subset renders as SVG, without executing TeX or external commands. Check diagrams in the preview; arbitrary TeX packages are not supported.
+
+Quiz lessons require strictly more than 80% (41/50) to complete and unlock later published lessons, including in freely navigable courses. PDF-only lessons retain normal completion behavior. Correct answers persist; retries contain only remaining questions. Solutions become visible after two wrong attempts on that question. Students may continue retrying after passing. Changing the test or mode invalidates old results and resets completion when a quiz is required. Answer keys/source are admin-only; grading, prerequisites and completion guards are enforced in PostgreSQL. Do not commit real answer keys: `*.private.tex/json/sql` are ignored.
+
+Run `node scripts/test-quiz-database.mjs` for scoring, retry, expiry, role and prerequisite security checks.

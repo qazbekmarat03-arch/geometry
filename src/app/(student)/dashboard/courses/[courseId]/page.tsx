@@ -1,3 +1,4 @@
+import type { QuizView } from "@/lib/quiz/import";
 import { notFound } from "next/navigation";
 import { getDashboardData } from "@/lib/db/dashboard";
 import { getAuthorizedLesson } from "@/lib/db/lesson";
@@ -26,8 +27,11 @@ export default async function CoursePage({
   const authorized = selected
     ? await getAuthorizedLesson(courseId, selected.id)
     : null;
+  const quiz = authorized && selected ? await authorized.supabase.rpc("get_lesson_quiz", {target_lesson:selected.id}) : null;
+  if(quiz?.error) throw new Error("Тестті жүктеу мүмкін болмады.");
   return (
     <CourseWorkspace
+      quiz={quiz?.data as QuizView | null}
       course={course}
       selected={selected}
       homework={

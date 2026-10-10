@@ -1,3 +1,4 @@
+import { QuizEditor } from "@/components/admin/quiz-editor";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -36,6 +37,8 @@ export default async function LessonEditor({
     homework_pdf_url: string | null;
     modules: { title: string; course_id: string };
   };
+  const homework = await db.from("lesson_homework").select("mode,source").eq("lesson_id",lessonId).maybeSingle();
+  if(homework.error) throw new Error("Homework settings could not be loaded");
   return (
     <>
       <ButtonLink
@@ -52,7 +55,8 @@ export default async function LessonEditor({
           <ContentForm kind="lesson" values={lesson} />
         </Card>
         <Card className="self-start !bg-[#102d21] !shadow-none">
-          <h2 className="mb-5 text-xl font-semibold">Үй тапсырмасы</h2>
+          <QuizEditor lessonId={lesson.id} initialMode={homework.data?.mode ?? "pdf"} initialSource={homework.data?.source ?? ""} />
+          <h2 className="mb-5 mt-8 text-xl font-semibold">PDF үй тапсырмасы</h2>
           {lesson.homework_pdf_url && (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-muted">

@@ -12,11 +12,13 @@ export function LessonPlayer({
   lessonId,
   position,
   completed,
+  quizRequired = false,
 }: {
   courseId: string;
   lessonId: string;
   position: number;
   completed: boolean;
+  quizRequired?: boolean;
 }) {
   const [done, setDone] = useState(completed);
   const [pending, setPending] = useState(false);
@@ -50,13 +52,13 @@ export function LessonPlayer({
       <VideoPlayer lessonId={lessonId} position={position} />
       <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
         <p className="text-xs text-muted">Сабақты аяқтап, біліміңді бекіт.</p>
-        <Button disabled={done || pending} onClick={() => void complete()}>
+        <Button disabled={done || completed || pending || quizRequired} onClick={() => void complete()}>
           {pending ? (
             <LoaderCircle size={17} className="animate-spin" />
           ) : (
             <Check size={17} />
           )}{" "}
-          {done ? "Сабақ аяқталды" : "Сабақты аяқтадым"}
+          {quizRequired ? "Алдымен тесттен өтіңіз" : done || completed ? "Сабақ аяқталды" : "Сабақты аяқтадым"}
         </Button>
       </div>
       {done && (

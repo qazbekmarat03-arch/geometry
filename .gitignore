@@ -5,3 +5,8 @@ out/
 !.env.example
 *.tsbuildinfo
 next-env.d.ts
+
+# Private lesson answer keys and one-off imports
+*.private.tex
+*.private.sql
+*.private.json

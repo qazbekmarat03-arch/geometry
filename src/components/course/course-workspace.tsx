@@ -1,3 +1,5 @@
+import { LessonQuiz } from "./lesson-quiz";
+import type { QuizView } from "@/lib/quiz/import";
 import { CurriculumPanel } from "./curriculum-panel";
 import Link from "next/link";
 import {
@@ -22,7 +24,9 @@ export function CourseWorkspace({
   course,
   selected,
   homework,
+  quiz,
 }: {
+  quiz: QuizView | null;
   course: CourseSummary;
   selected?: Selected;
   homework: {
@@ -180,7 +184,8 @@ export function CourseWorkspace({
               courseId={course.id}
               lessonId={selected.id}
               position={selected.progress?.video_progress ?? 0}
-              completed={!!selected.progress?.completed}
+              quizRequired={!!quiz && quiz.mode !== "pdf" && !quiz.passed}
+              completed={!!selected.progress?.completed && (!quiz || quiz.passed)}
             />
             <nav
               aria-label="Сабақтар арасында өту"
@@ -230,7 +235,8 @@ export function CourseWorkspace({
                 </p>
               </div>
             </div>
-            <HomeworkCard lessonId={selected.id} {...homework} />
+            {quiz?.mode !== "quiz" && <HomeworkCard lessonId={selected.id} {...homework} />}
+            {quiz && quiz.mode !== "pdf" && <LessonQuiz key={`${selected.id}-${quiz.version}`} lessonId={selected.id} initial={quiz} />}
           </article>
         ) : (
           <EmptyState
