@@ -23,7 +23,7 @@ export type QuizView = {
 };
 
 const solutionsHeading =
-  /\\section\*?\{[^}]*(?:жауап(?:тары| кілті)?|шешімдері|шешу жолдары|шығарылу жолдары)[^}]*\}/i;
+  /\\(?:section\*?|textbf)\{[^}]*(?:жауап(?:тары| кілті)?|шешімдері|шешу жолдары|шығарылу жолдары)[^}]*\}/i;
 export function splitQuizSource(source: string) {
   const boundary = source.search(solutionsHeading);
   return boundary < 0
@@ -52,6 +52,7 @@ export function cleanTex(text: string) {
     .replace(/\\(?:vspace|hspace)\*?\{[^}]*\}/g, "")
     .replace(/\\(?:newpage|clearpage)/g, "")
     .replace(/\\(?:subsection|section)\*?\{[^}]*\}/g, "")
+    .replace(solutionsHeading, "")
     .replace(/\\(?:begin|end)\{(?:center|enumerate|document)\}/g, "")
     .replace(/\\textbf\{([^{}]*)\}/g, "$1")
     .replace(/\\\\/g, "\n")
@@ -68,12 +69,24 @@ export function importQuiz(source: string): QuizQuestion[] {
       "Жауаптар бөлімі қажет: \\section{Үй тапсырмасының жауаптары мен шығарылу жолдары}",
     );
   const chunks = source.slice(0, boundary).split(/\\qnum\{(\d+)\}/);
-  const solutionItems = source
-    .slice(boundary)
-    .split(/\\item(?:\s*\[[^\]]*\])?\s*/)
-    .slice(1);
+  const solutionSource = source.slice(boundary);
+  const numberedSolutions = solutionSource.split(/\\qnum\{(\d+)\}/);
+  const solutionItems: string[] = [];
+  if (numberedSolutions.length > 1) {
+    for (let i = 1; i < numberedSolutions.length; i += 2) {
+      if (Number(numberedSolutions[i]) !== solutionItems.length + 1)
+        throw new Error("Шешімдер 1-ден бастап ретімен нөмірленуі керек.");
+      solutionItems.push(numberedSolutions[i + 1]);
+    }
+  } else {
+    solutionItems.push(
+      ...solutionSource.split(/\\item(?:\s*\[[^\]]*\])?\s*/).slice(1),
+    );
+  }
   const solutions = solutionItems.map((item, index) => {
-    const body = item.split(/\\end\{enumerate\}/)[0];
+    const body = item
+      .split(/\\end\{enumerate\}/)[0]
+      .replace(new RegExp(solutionsHeading.source, "gi"), "");
     const normalized = body.replace(/\\textbf\{([^{}]*)\}/g, "$1");
     const keys = [
       ...normalized.matchAll(
