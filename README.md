@@ -147,6 +147,8 @@ After saving, Drive sharing can be closed again. Students receive only the platf
 
 ## Request latency
 
+Production builds inline initial CSS so the first render does not depend on a separate stylesheet download. This uses Next's experimental `inlineCss` option: HTML is larger and styles are not independently cached on initial loads; client navigation can still request external CSS. Recheck this behavior when upgrading Next. Deployment IDs use the host's `NEXT_DEPLOYMENT_ID` / `VERCEL_DEPLOYMENT_ID`, falling back to the Git commit SHA, to version asset requests and detect navigation version mismatches. This does not itself enable Vercel's paid Skew Protection routing. No service worker or custom browser cache is installed.
+
 Invitation/owner claims run only at the verified OAuth callback. Protected requests still check the authenticated identity, current profile and active/unexpired grant on every request. No permission results are cached across users or requests. A lesson page loads only its own course curriculum, rather than every enrolled course. `vercel.json` puts server functions in `bom1`, alongside the Supabase Mumbai database; update this if the database moves. Protected sidebar links do not prefetch unopened pages, reducing parallel permission/database requests. Decorative WebGL remains isolated to the public landing page.
 
 Landing result cards transcribe teacher-provided 2025 UNT scores using first names only; original documents with personal identifiers and QR codes are not published. No fabricated student quotations are included.

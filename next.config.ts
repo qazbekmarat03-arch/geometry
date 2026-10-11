@@ -18,7 +18,15 @@ for (const [name, value] of Object.entries(process.env)) {
 }
 const config: NextConfig = {
   reactStrictMode: true,
-  experimental: { serverActions: { bodySizeLimit: "12mb" } },
+  deploymentId:
+    process.env.NEXT_DEPLOYMENT_ID ||
+    process.env.VERCEL_DEPLOYMENT_ID ||
+    process.env.VERCEL_GIT_COMMIT_SHA,
+  experimental: {
+    // Keep initial rendering independent of a separate stylesheet request.
+    inlineCss: true,
+    serverActions: { bodySizeLimit: "12mb" },
+  },
   turbopack: { root: process.cwd() },
 };
 export default config;
