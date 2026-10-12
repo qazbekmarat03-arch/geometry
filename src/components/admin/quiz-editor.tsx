@@ -12,6 +12,7 @@ const QuizText = dynamic(
   { loading: () => <span>Формула жүктелуде...</span> },
 );
 import { saveHomeworkMode } from "@/app/(admin)/admin/courses/quiz-actions";
+import { savePracticeQuiz } from "@/app/(admin)/admin/practice/actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 const example = String.raw`\qnum{1} Сыбайлас бұрыштардың қосындысы?
@@ -27,10 +28,12 @@ export function QuizEditor({
   lessonId,
   initialMode,
   initialSource,
+  practice = false,
 }: {
   lessonId: string;
   initialMode: string;
   initialSource: string;
+  practice?: boolean;
 }) {
   const initial = splitQuizSource(initialSource);
   const [mode, setMode] = useState(initialMode),
@@ -55,7 +58,7 @@ export function QuizEditor({
     setPending(true);
     setError("");
     try {
-      const result = await saveHomeworkMode(
+      const result = await (practice ? savePracticeQuiz : saveHomeworkMode)(
         lessonId,
         mode,
         combineQuizSource(source, solutions),
@@ -96,27 +99,37 @@ export function QuizEditor({
   const selected = preview[previewIndex];
   return (
     <section className="quiz-editor">
-      <h2 className="text-xl font-semibold">Тапсырма түрі және тест</h2>
-      <label className="mt-5 block">
-        Үй тапсырмасын беру түрі
-        <select
-          className="premium-input mt-2 w-full"
-          value={mode}
-          onChange={(e) => setMode(e.target.value)}
-          disabled={pending}
-        >
-          <option value="pdf">Тек PDF — тест шегі жоқ</option>
-          <option value="quiz">Сайттағы тест — 80%-дан көп</option>
-          <option value="both">PDF және тест — 80%-дан көп</option>
-        </select>
-      </label>
-      <p className="my-4 text-sm text-muted">
-        PDF файлын төменнен тіркеңіз. Тест немесе «екеуі бірге» таңдалса, оқушы
-        келесі сабаққа өту үшін 80%-дан көп жинауы керек. Тест өзгерсе, бұрынғы
-        нәтижелер жаңадан тапсыруды талап етеді.
-      </p>
+      <h2 className="text-xl font-semibold">
+        {practice
+          ? "Нұсқа тапсырмалары және талдау"
+          : "Тапсырма түрі және тест"}
+      </h2>
+      {!practice && (
+        <>
+          <label className="mt-5 block">
+            Үй тапсырмасын беру түрі
+            <select
+              className="premium-input mt-2 w-full"
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+              disabled={pending}
+            >
+              <option value="pdf">Тек PDF — тест шегі жоқ</option>
+              <option value="quiz">Сайттағы тест — 80%-дан көп</option>
+              <option value="both">PDF және тест — 80%-дан көп</option>
+            </select>
+          </label>
+          <p className="my-4 text-sm text-muted">
+            PDF файлын төменнен тіркеңіз. Тест немесе «екеуі бірге» таңдалса,
+            оқушы келесі сабаққа өту үшін 80%-дан көп жинауы керек. Тест
+            өзгерсе, бұрынғы нәтижелер жаңадан тапсыруды талап етеді.
+          </p>
+        </>
+      )}
       <ol className="my-5 list-decimal space-y-2 pl-5 text-sm text-muted">
-        <li>Тапсырма түрін таңдаңыз: PDF, тест немесе екеуі бірге.</li>
+        {!practice && (
+          <li>Тапсырма түрін таңдаңыз: PDF, тест немесе екеуі бірге.</li>
+        )}
         <li>
           Сұрақтар мен шешімдердің кодын төмендегі бөлек өрістерге қойыңыз
           немесе .tex / .txt файлдарын таңдаңыз.
@@ -211,14 +224,24 @@ export function QuizEditor({
           Алдын ала қарау
         </Button>
         <Button disabled={pending} onClick={() => void save()}>
-          {pending ? "Сақталуда..." : "Тапсырма түрін және тестті сақтау"}
+          {pending
+            ? "Сақталуда..."
+            : practice
+              ? "Нұсқа тапсырмаларын сақтау"
+              : "Тапсырма түрін және тестті сақтау"}
         </Button>
       </div>
       {selected && (
         <div className="quiz-preview">
           <p className="mb-4" role="status">
-            {preview.length} сұрақ · өту үшін кемінде{" "}
-            {Math.floor(preview.length * 0.8) + 1} дұрыс жауап
+            {preview.length} сұрақ
+            {!practice && (
+              <>
+                {" "}
+                · өту үшін кемінде {Math.floor(preview.length * 0.8) + 1} дұрыс
+                жауап
+              </>
+            )}
           </p>
           <label className="mb-4 block text-sm">
             Қарайтын сұрақ

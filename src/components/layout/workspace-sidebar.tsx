@@ -18,6 +18,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { signOut } from "@/app/auth/actions";
 import { cn } from "@/lib/utils";
 const studentLinks = [
+  { href: "/practice", title: "Нұсқа талдау", icon: BookOpen },
   { href: "/dashboard", title: "Басты бет", icon: House },
   { href: "/dashboard/courses", title: "Менің курстарым", icon: BookOpen },
   {
@@ -28,6 +29,7 @@ const studentLinks = [
   { href: "/dashboard/profile", title: "Профиль", icon: UserRound },
 ];
 const adminLinks = [
+  { href: "/admin/practice", title: "Нұсқа талдау", icon: BookOpen },
   { href: "/admin", title: "Басты бет", icon: House },
   { href: "/admin/students", title: "Оқушылар", icon: Users },
   { href: "/admin/courses", title: "Курстар", icon: BookOpen },
@@ -56,13 +58,16 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
         aria-label={admin ? "Әкімші навигациясы" : "Студент навигациясы"}
         className="hidden space-y-1.5 px-4 lg:block"
       >
-        {links.map(({ href, title, icon: Icon }, i) => {
+        {links.map(({ href, title, icon: Icon }) => {
           const active =
             pathname === href ||
-            (i > 0 && pathname.startsWith(href + "/")) ||
+            (href !== "/dashboard" &&
+              href !== "/admin" &&
+              pathname.startsWith(href + "/")) ||
             (href === "/admin/lessons" && pathname === "/admin/homework");
           return (
-            <Link prefetch={false}
+            <Link
+              prefetch={false}
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
@@ -89,7 +94,8 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
               {admin ? "Анық басқару." : "жаңа мүмкіндік."}
             </span>
           </p>
-          <Link prefetch={false}
+          <Link
+            prefetch={false}
             href={admin ? "/dashboard" : "/#program"}
             className="mt-4 inline-flex items-center gap-3 text-[11px] text-muted"
           >

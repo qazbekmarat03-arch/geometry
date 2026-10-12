@@ -4,7 +4,13 @@ import { ArrowRight, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ui/toast";
-export function GoogleLoginButton({ configured }: { configured: boolean }) {
+export function GoogleLoginButton({
+  configured,
+  practice = false,
+}: {
+  configured: boolean;
+  practice?: boolean;
+}) {
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -12,6 +18,8 @@ export function GoogleLoginButton({ configured }: { configured: boolean }) {
     setPending(true);
     setError("");
     try {
+      // A fixed, non-sensitive return hint; it never grants access.
+      document.cookie = `durystap-practice-return=${practice ? "1" : ""}; Path=/; Max-Age=${practice ? 600 : 0}; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
       const { error } = await createClient().auth.signInWithOAuth({
         provider: "google",
         options: {

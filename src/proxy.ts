@@ -9,6 +9,7 @@ export const config = {
     "/admin/:path*",
     "/auth/:path*",
     "/login",
+    "/practice/:path*",
     "/access-denied",
     "/api/lessons/:path*",
   ],

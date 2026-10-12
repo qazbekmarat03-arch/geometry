@@ -225,6 +225,7 @@ export function DURYSTAPLanding() {
     ["#program", t("Бағдарлама", "Программа", "Curriculum")],
     ["#free-lesson", t("Тегін сабақ", "Бесплатный урок", "Free lesson")],
     ["#pricing", t("Бағасы", "Стоимость", "Pricing")],
+    ["#practice", t("Нұсқа талдау", "Разбор вариантов", "Practice tests")],
   ];
   return (
     <div
@@ -1042,6 +1043,49 @@ export function DURYSTAPLanding() {
           </p>
         </section>
 
+        <section id="practice" className="gm-section">
+          <div className="gm-container">
+            <div className="gm-center-heading">
+              <span className="gm-eyebrow">ҰБТ МАТЕМАТИКА · НҰСҚА ТАЛДАУ</span>
+              <h2>
+                Біліміңді сына.
+                <br />
+                <span>Қатеңнің себебін түсін.</span>
+              </h2>
+              <p>
+                ҰБТ спецификациясына сай дайындалған математика нұсқалары:
+                тапсырмаларды орында, нәтижеңді көр және әр есептің толық
+                талдауын оқы.
+              </p>
+              <p>
+                <strong>Бір нұсқа + талдауы — 500 ₸.</strong> Тегін нұсқалар да
+                осы бөлімде болады.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <a
+                  className="gm-button gm-button-lime"
+                  href={
+                    "https://wa.me/77755851203?text=" +
+                    encodeURIComponent(
+                      "Сәлеметсіз бе! 500 ₸ тұратын ҰБТ математика нұсқасын талдауымен алғым келеді.",
+                    )
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  WhatsApp арқылы алу ↗
+                </a>
+                <Link className="gm-button gm-button-ghost" href="/practice">
+                  Нұсқаларды көру →
+                </Link>
+              </div>
+              <p className="mt-4">
+                Төлемнен кейін Google аккаунтыңыздың email мекенжайын жіберіңіз
+                — Қазбек ағай қолжетімділікті ашады.
+              </p>
+            </div>
+          </div>
+        </section>
         <section id="pricing" className="gm-section gm-pricing-section">
           <div className="gm-container">
             <div className="gm-center-heading" data-reveal>

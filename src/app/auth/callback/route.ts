@@ -10,9 +10,15 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const access = await getAccountAccess(supabase, { claimOnLogin: true });
       const response = NextResponse.redirect(
-        new URL(accessDestination(access), request.url),
+        new URL(
+          request.cookies.get("durystap-practice-return")?.value === "1"
+            ? "/practice"
+            : accessDestination(access),
+          request.url,
+        ),
       );
       response.headers.set("Cache-Control", "private, no-store");
+      response.cookies.delete("durystap-practice-return");
       return response;
     }
   }

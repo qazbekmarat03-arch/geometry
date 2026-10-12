@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Mail, ShieldCheck } from "lucide-react";
 
 import { AuthShell } from "@/components/layout/auth-shell";
@@ -47,6 +48,12 @@ export default async function AccessDeniedPage() {
       <form action={switchAccount}>
         <SubmitButton className="w-full">Басқа аккаунтпен кіру</SubmitButton>
       </form>
+      <Link
+        href="/practice"
+        className="mt-5 block text-center text-brand underline"
+      >
+        Нұсқа талдау бөліміне өту
+      </Link>
     </AuthShell>
   );
 }

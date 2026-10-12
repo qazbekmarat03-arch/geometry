@@ -11,11 +11,12 @@ export const metadata = { title: "Кіру" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
   const access = await getSessionAccess();
-  if (access.status !== "signed-out") redirect(accessDestination(access));
+  if (access.status !== "signed-out")
+    redirect(next === "practice" ? "/practice" : accessDestination(access));
   return (
     <AuthShell>
       <p className="mb-3 text-xs font-semibold tracking-widest text-brand">
@@ -30,7 +31,10 @@ export default async function LoginPage({
           Кіру аяқталмады. Қайта көріңіз.
         </p>
       )}
-      <GoogleLoginButton configured={!!getSupabaseConfig()} />
+      <GoogleLoginButton
+        configured={!!getSupabaseConfig()}
+        practice={next === "practice"}
+      />
       <div className="mt-7 flex items-center gap-2 border-t border-line pt-5 text-xs text-muted">
         <ShieldCheck size={17} className="text-brand" />
         Google аккаунтыңмен қауіпсіз кіру
