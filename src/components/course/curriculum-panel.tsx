@@ -14,16 +14,21 @@ export function CurriculumPanel({
   children: ReactNode;
 }) {
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, () => false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState<boolean | null>(null);
   return (
     <details
       className="lesson-curriculum"
-      open={desktop || expanded}
+      open={expanded ?? desktop}
       onToggle={(event) => {
-        if (!desktop) setExpanded(event.currentTarget.open);
+        setExpanded(event.currentTarget.open);
       }}
     >
-      <summary>Курс бағдарламасы · {count} сабақ</summary>
+      <summary>
+        Курс бағдарламасы · {count} сабақ{" "}
+        <span className="ml-auto text-xs">
+          {(expanded ?? desktop) ? "Жинау −" : "Ашу +"}
+        </span>
+      </summary>
       {children}
     </details>
   );

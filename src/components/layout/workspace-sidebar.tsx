@@ -40,7 +40,10 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
   const pathname = usePathname();
   const links = admin ? adminLinks : studentLinks;
   return (
-    <aside className="workspace-sidebar">
+    <aside
+      id={admin ? "admin-navigation" : "student-navigation"}
+      className="workspace-sidebar"
+    >
       <MobileNavigation
         links={links.map(({ href, title }) => ({ href, title }))}
         signedIn

@@ -1,14 +1,14 @@
 @import "tailwindcss";
 @import "./interior.css";
 @theme inline {
-  --color-brand: #2ee59d;
-  --color-brand-dark: #0b2a1f;
-  --color-brand-light: #123b2d;
-  --color-ink: #ecf7f0;
-  --color-muted: #a6beb0;
-  --color-line: #24483a;
-  --color-surface: #0d241b;
-  --color-lime: #c6ff4d;
+  --color-brand: var(--ui-brand, #2ee59d);
+  --color-brand-dark: var(--ui-brand-dark, #0b2a1f);
+  --color-brand-light: var(--ui-brand-light, #123b2d);
+  --color-ink: var(--ui-ink, #ecf7f0);
+  --color-muted: var(--ui-muted, #a6beb0);
+  --color-line: var(--ui-line, #24483a);
+  --color-surface: var(--ui-surface, #0d241b);
+  --color-lime: var(--ui-lime, #c6ff4d);
   --font-sans: var(--font-inter), sans-serif;
   --font-display: var(--font-heading), sans-serif;
   --shadow-card: 0 4px 8px -6px #18271a0a, 0 18px 50px -26px #18271a20;
@@ -780,3 +780,45 @@ body { color-scheme: dark; }
  .workspace .workspace-main h1 { font-size: clamp(28px,7vw,36px); }
  .workspace .workspace-sidebar { position: sticky; top: 0; z-index: 30; background: #081b13f2 !important; backdrop-filter: blur(16px); }
 }
+
+/* Student preferences are scoped; landing/admin palettes remain unchanged. */
+.student-workspace .lesson-curriculum > summary { display:flex; align-items:center; gap:12px; padding:14px 0; cursor:pointer; }
+.student-workspace .lesson-curriculum > summary::after { display:none; }
+.student-workspace .lesson-layout:has(.lesson-curriculum:not([open])) { grid-template-columns:minmax(0,1fr); gap:20px; }
+.student-workspace .lesson-curriculum:not([open]) { position:static; border:1px solid var(--color-line); border-radius:16px; padding:0 16px; }
+@media(min-width:1024px) {
+ .student-workspace.menu-collapsed .workspace-sidebar { display:none; }
+ .student-workspace.menu-collapsed .workspace-content { padding-left:0 !important; }
+}
+.workspace-light {
+ --ui-brand:#087647; --ui-brand-dark:#0b2a1f; --ui-brand-light:#dcf2e6;
+ --ui-ink:#102d21; --ui-muted:#52695d; --ui-line:#c6d9cd; --ui-surface:#edf5ef; --ui-lime:#c6ff4d;
+ --color-brand:var(--ui-brand); --color-ink:var(--ui-ink); --color-muted:var(--ui-muted); --color-line:var(--ui-line); --color-surface:var(--ui-surface);
+ --surface-base:#f6faf7; --surface-raised:#fff; --surface-inset:#edf5ef; --border-fine:#c6d9cd;
+ color:var(--ui-ink); color-scheme:light;
+}
+.workspace.workspace-light, .workspace-light .workspace-main { background:#f6faf7; }
+.workspace.workspace-light .workspace-sidebar { background:#fff !important; border-color:#c6d9cd !important; }
+.workspace-light .workspace-header { border-bottom:1px solid #c6d9cd; }
+.workspace.workspace-light .workspace-sidebar nav a[aria-current="page"] { background:#dcf2e6 !important; color:#075c39 !important; }
+.workspace-light :is(.premium-card,.course-tile,.editorial-table,.empty-installation,.quiz-homework,.lesson-curriculum) { background:#fff; border-color:#c6d9cd; }
+.workspace-light :is(.continue-panel,.lesson-row[aria-current="page"],.quiz-score) { background:#dcf2e6; color:#075c39; border-color:#a1ceb4; }
+.workspace-light :is(.lesson-row:hover,tbody tr:hover) { background:#edf5ef; }
+.workspace-light :is(.lesson-row[aria-disabled],.module-order) { color:#52695d; }
+.workspace-light :is(.quiz-question legend,.quiz-options label > span,.quiz-solution summary,.course-tile-footer .premium-button) { color:#075c39; }
+.workspace-light .quiz-solution { background:#edf5ef; }
+.workspace.workspace-light :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']),textarea,select) { background:#fff; color:#102d21; border-color:#c6d9cd; }
+.workspace-light :is(.button-secondary,.button-ghost) { color:#102d21; border-color:#c6d9cd; }
+.workspace-light :is(.bg-white,.bg-white\/80,.bg-white\/70) { background:#fff; }
+.workspace-light :is(.text-red-300,.text-red-600,.text-red-700) { color:#a61b35; }
+.workspace-light :is(.text-green-700,.text-emerald-700) { color:#087647; }
+.workspace-light .pdf-sheet { color:#087647; }
+
+.workspace-light .continue-panel [class*="text-white"] { color:#52695d; }
+.workspace-light .continue-panel h3 { color:#102d21; }
+.workspace-light .homework-document { background:#edf5ef; }
+.workspace-light .pdf-sheet { background:#dcf2e6; border-color:#a1ceb4; }
+
+.workspace-light .button-secondary { background:#edf5ef; }
+.workspace-light :is(.button-secondary,.button-ghost):hover { background:#dcf2e6; }
+.workspace-light :focus-visible { outline-color:#087647; }
