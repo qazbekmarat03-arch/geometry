@@ -1,13 +1,15 @@
 export type PracticeView = {
   version: number;
   score: number | null;
-  answers: number[] | null;
+  answers: (number | number[])[] | null;
   submittedAt: string | null;
   questions: {
     id: number;
     prompt: string;
     options: string[];
-    answer: number | null;
+    kind?: "single" | "multiple" | "matching";
+    rows?: string[];
+    answer: number | number[] | null;
     solution: string | null;
   }[];
 };

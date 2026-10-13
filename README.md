@@ -178,3 +178,37 @@ Apply `20261013001400_practice_exams.sql` before deploying. `/admin/practice` cr
 `/practice` lists published titles; question data is returned only by access-checked database RPCs. Source and answer keys are admin-only. Submission validates version, count and every answer, stores the current user's latest score, then reveals worked solutions. A retry replaces the latest result; edited questions invalidate previous results. The current format is the same as homework: 1–100 questions, four choices, one correct choice, one point each (not a reproduction of every official exam scoring format). LaTeX is parsed as bounded data, never executed. `/login?next=practice` uses a fixed local return hint without changing OAuth redirect URLs or course authorization.
 
 Use `node scripts/test-quiz-database.mjs` to check grants, revocation, drafts, inactive users, hidden solutions and result isolation. No sample exams are published automatically. The administrator supplies and checks the test content before publication.
+
+
+### Нұсқа талдау: TeX форматтары және шешімдер
+
+Нұсқа редакторы `\question` және `\qnum{1}` сұрақтарын, A–D бір жауапты,
+A–F бірнеше жауапты және `tabular` + `multirow` сәйкестендіру кестелерін қабылдайды.
+Сәйкестендіру кестесіндегі жолдар `1)`, `2)` деп нөмірленеді.
+Ортақ мәтін `\begin{center}\textbf{\Large МӘТІН: ...}` деп басталып,
+«26-30 тапсырмалар» нұсқаулығы және `\setcounter{qnumber}{25}` арқылы аяқталса,
+сол сұрақтардың әрқайсысында көрсетіледі. TikZ plot үшін шектелген арифметика,
+`x`, `ln`, `sqrt`, `sin`, `cos`, `exp` қолданылады; TeX коды орындалмайды.
+
+Сұрақтарды жауапсыз алдын ала қарауға болады. «Шешімдер үлгісін жасау»
+әр сұраққа бос шешім блогын дайындайды; ол жауаптарды ойдан толтырмайды.
+Бөлек шешімдер өрісінде:
+
+```tex
+\qnum{1}
+Жауабы: B
+Толық шешу жолы, $x=2$.
+\qnum{2}
+Жауабы: A, C, E
+Бірнеше жауаптың әрқайсысына түсіндіру.
+\qnum{3}
+Жауабы: 1-B, 2-C
+Екі сәйкестіктің шығару жолдары.
+```
+
+Дұрыс жауап пен шешімсіз нұсқа сақталмайды. Оқушы аяқтағаннан кейін
+«Қате есептерді талдау» арқылы қателерінің шешімдерін көреді. Бір толық дұрыс
+тапсырма = 1 ұпай; бірнеше жауапта толық жиын, сәйкестендіруде барлық жол
+дұрыс болуы керек. Бұл ресми ҰБТ-ның ішінара ұпай есептеу жүйесі емес.
+Сервер бағалайды; кілттер мен шешімдер тапсыруға дейін берілмейді.
+`20261013001500_practice_question_types.sql` миграциясын қолдану қажет.

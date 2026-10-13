@@ -150,6 +150,28 @@ try {
   await asUser(admin);questions[0].prompt='New version';await db.query('select admin_save_practice($1,$2,$3)',[free,'new',JSON.stringify(questions)]);
   await asUser(student);await assert.rejects(()=>db.query('select submit_practice($1,1,$2)',[free,'[0,0,0,0,0]']));checks++;
   assert.equal((await getPractice(free)).score,null);checks++;
+  const mixed=[
+    {prompt:'Single',options:['A','B','C','D'],kind:'single',rows:[],answer:1,solution:'single solution'},
+    {prompt:'Multiple',options:['A','B','C','D','E','F'],kind:'multiple',rows:[],answer:[0,2,4],solution:'multiple solution'},
+    {prompt:'Matching',options:['A','B','C','D'],kind:'matching',rows:['First','Second'],answer:[1,2],solution:'matching solution'}
+  ];
+  await asUser(admin);
+  await db.query('select admin_save_practice($1,$2,$3)',[free,'mixed',JSON.stringify(mixed)]);
+  const malformed=structuredClone(mixed);malformed[1].answer=[0,0];
+  await assert.rejects(()=>db.query('select admin_save_practice($1,$2,$3)',[free,'bad',JSON.stringify(malformed)]));checks++;
+  await asUser(student);
+  practice=await getPractice(free);
+  assert.ok(practice.questions.every(q=>q.answer===null&&q.solution===null));checks++;
+  assert.deepEqual(practice.questions[2].rows,['First','Second']);checks++;
+  for (const chosen of [[1,[0,0],[1,2]],[1,[0,2,4],[1]],[1,[0,2,6],[1,2]],[1,[0,2,4],[null,2]],[1,[0,2,4],{}]]) {
+    await assert.rejects(()=>db.query('select submit_practice($1,$2,$3)',[free,practice.version,JSON.stringify(chosen)]));checks++;
+  }
+  let mixedResult=(await db.query('select submit_practice($1,$2,$3) as value',[free,practice.version,JSON.stringify([1,[4,0,2],[1,2]])])).rows[0].value;
+  assert.equal(mixedResult.score,3);checks++;
+  mixedResult=(await db.query('select submit_practice($1,$2,$3) as value',[free,practice.version,JSON.stringify([0,[0,2],[2,1]])])).rows[0].value;
+  assert.equal(mixedResult.score,0);checks++;
+  assert.equal(mixedResult.questions[2].solution,'matching solution');checks++;
+  await asUser(other);assert.equal((await getPractice(free)).questions[2].solution,null);checks++;
   await asUser(admin);await db.exec(`update practice_exams set is_published=false where id='${free}'`);
   await asUser(student);await denied(`select get_practice('${free}')`,'unpublished exam inaccessible');
   console.log(`Quiz and practice security: ${checks} checks passed.`);

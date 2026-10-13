@@ -5,7 +5,7 @@ import type { PracticeView } from "@/lib/practice";
 export async function submitPractice(
   id: string,
   version: number,
-  answers: number[],
+  answers: (number | number[])[],
 ): Promise<{ data?: PracticeView; error?: string }> {
   if (
     !validId(id) ||
@@ -13,7 +13,13 @@ export async function submitPractice(
     !Array.isArray(answers) ||
     answers.length < 1 ||
     answers.length > 100 ||
-    answers.some((v) => !Number.isInteger(v) || v < 0 || v > 3)
+    answers.some((v) =>
+      Array.isArray(v)
+        ? v.length < 1 ||
+          v.length > 6 ||
+          v.some((n) => !Number.isInteger(n) || n < 0 || n > 5)
+        : !Number.isInteger(v) || v < 0 || v > 5,
+    )
   )
     return { error: "Барлық сұрақтарға жауап беріңіз." };
   const db = await createClient();

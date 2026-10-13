@@ -1,3 +1,4 @@
+import { plotExpression } from "./plot-expression.ts";
 type Point = [number, number];
 export type Diagram = {
   paths: { d: string; dashed: boolean; thick: boolean }[];
@@ -68,6 +69,37 @@ export function parseDiagram(source: string): Diagram {
       );
     const style = command[2] ?? "";
     s = s.slice(command[0].length);
+    if (s.startsWith("plot")) {
+      const plot = s.match(/^plot\s*\((?:\{\\x\}|\\x),\s*\{([^{}]+)\}\)$/);
+      const domain = style.match(/domain=(-?[\d.]+):(-?[\d.]+)/);
+      if (!plot || !domain)
+        throw new Error("Графикке domain және plot өрнегі қажет.");
+      const evaluate = plotExpression(plot[1]);
+      const from = Number(domain[1]),
+        to = Number(domain[2]);
+      if (
+        !Number.isFinite(from + to) ||
+        from >= to ||
+        Math.abs(from) > 1000 ||
+        Math.abs(to) > 1000
+      )
+        throw new Error("График аралығы дұрыс емес.");
+      let d = "";
+      for (let k = 0; k <= 100; k++) {
+        const x = from + ((to - from) * k) / 100;
+        const y = evaluate(x);
+        if (!Number.isFinite(y) || Math.abs(y) > 1000)
+          throw new Error("График шектен тыс.");
+        points.push([x, y]);
+        d += `${k ? "L" : "M"}${xy([x, y])} `;
+      }
+      paths.push({
+        d,
+        dashed: style.includes("dashed"),
+        thick: style.includes("thick"),
+      });
+      continue;
+    }
     let previous: Point = [0, 0];
     let current: Point = [0, 0],
       start: Point = [0, 0],

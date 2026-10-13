@@ -1,7 +1,7 @@
 "use server";
 import { requireAdmin } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { importQuiz } from "@/lib/quiz/import";
+import { importPractice } from "@/lib/quiz/practice-import";
 import { validId } from "@/lib/course/media";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -54,7 +54,7 @@ export async function savePracticeQuiz(
   if (!validId(id) || typeof source !== "string" || source.length > 250000)
     return { ok: false, message: "Мәлімет дұрыс емес." };
   try {
-    const questions = importQuiz(source);
+    const questions = importPractice(source);
     const { error } = await (
       await createClient()
     ).rpc("admin_save_practice", {

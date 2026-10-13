@@ -6,6 +6,12 @@ import {
   combineQuizSource,
   type QuizQuestion,
 } from "@/lib/quiz/import";
+import {
+  importPractice,
+  parsePracticeQuestions,
+  practiceSolutionTemplate,
+  type PracticeQuestion,
+} from "@/lib/quiz/practice-import";
 import dynamic from "next/dynamic";
 const QuizText = dynamic(
   () => import("@/components/course/quiz-text").then((m) => m.QuizText),
@@ -40,13 +46,24 @@ export function QuizEditor({
     [source, setSource] = useState(initial.questions),
     [solutions, setSolutions] = useState(initial.solutions),
     [previewIndex, setPreviewIndex] = useState(0),
-    [preview, setPreview] = useState<QuizQuestion[]>([]),
+    [preview, setPreview] = useState<(QuizQuestion | PracticeQuestion)[]>([]),
     [error, setError] = useState(""),
     [pending, setPending] = useState(false);
   const toast = useToast();
   function inspect() {
     try {
-      setPreview(importQuiz(combineQuizSource(source, solutions)));
+      const combined = combineQuizSource(source, solutions);
+      setPreview(
+        practice
+          ? splitQuizSource(combined).solutions
+            ? importPractice(combined)
+            : parsePracticeQuestions(combined).map((q) => ({
+                ...q,
+                answer: -1,
+                solution: "",
+              }))
+          : importQuiz(combined),
+      );
       setPreviewIndex(0);
       setError("");
     } catch (e) {
@@ -144,11 +161,11 @@ export function QuizEditor({
         </summary>
         <pre className="overflow-auto p-3 text-xs">{example}</pre>
         <p className="text-xs text-muted">
-          1–100 сұрақ. Әрқайсысында A–D жауаптары және жауаптар бөлімінде шешімі
-          болсын. «Жауабы: B» шешімнің басында да, соңында да жазыла алады;
-          нүкте міндетті емес. $...$ формулалары, қарапайым TikZ: coordinate,
-          draw, path, node, кесінділер мен доғалар қолданылады. Толық TeX
-          бағдарламасы орындалмайды.
+          1–100 сұрақ. \question немесе \qnum&#123;1&#125;. Әрқайсысында A–D
+          жауаптары және жауаптар бөлімінде шешімі болсын. «Жауабы: B» шешімнің
+          басында да, соңында да жазыла алады; нүкте міндетті емес. $...$
+          формулалары, қарапайым TikZ: coordinate, draw, path, node, кесінділер
+          мен доғалар қолданылады. Толық TeX бағдарламасы орындалмайды.
         </p>
       </details>
       <label className="mb-3 block text-sm">
@@ -183,6 +200,35 @@ export function QuizEditor({
         түрде бөлінеді. Толық кодты бірінші өріске де қоюға болады — екінші
         өрісті бос қалдырыңыз.
       </p>
+      {practice && (
+        <div className="my-5 rounded-2xl border border-line p-4 text-sm">
+          <p>
+            Нұсқада: A–D — бір жауап; A–F — бірнеше жауап; tabular / multirow —
+            сәйкестендіру. Сұрақтарды шешімсіз алдын ала көруге болады, бірақ
+            сақтау үшін жауап кілті мен толық шешімі қажет.
+          </p>
+          <p className="mt-2">
+            Шешімдерді ретімен жазыңыз: \qnum&#123;1&#125;, жеке жолда «Жауабы:
+            B», «Жауабы: A, C, E» немесе «Жауабы: 1-B, 2-C», келесі жолда толық
+            шығару жолы. Оқушы аяқтағаннан кейін қателерін талдай алады.
+          </p>
+          <Button
+            className="mt-3"
+            variant="secondary"
+            disabled={pending || !!solutions.trim()}
+            onClick={() => {
+              try {
+                setSolutions(practiceSolutionTemplate(source));
+                setError("");
+              } catch (e) {
+                setError(e instanceof Error ? e.message : "Код дұрыс емес.");
+              }
+            }}
+          >
+            Шешімдер үлгісін жасау
+          </Button>
+        </div>
+      )}
       <label className="mb-3 mt-5 block text-sm">
         Шешімдер файлы (.tex / .txt)
         <input
@@ -258,21 +304,40 @@ export function QuizEditor({
             </select>
           </label>
           <QuizText text={selected.prompt} />
+          {"rows" in selected &&
+            selected.rows.map((row, i) => (
+              <div className="my-3" key={i}>
+                <span>{i + 1}) </span>
+                <QuizText text={row} />
+              </div>
+            ))}
           <div className="quiz-options">
             {selected.options.map((o, j) => (
               <div
                 className="flex items-start gap-3 rounded-xl border border-white/15 p-3"
                 key={j}
               >
-                <span>{"ABCD"[j]})</span>
+                <span>{"ABCDEF"[j]})</span>
                 <QuizText text={o} />
               </div>
             ))}
           </div>
-          <details className="quiz-solution">
-            <summary>Дұрыс жауап пен шешім · {"ABCD"[selected.answer]}</summary>
-            <QuizText text={selected.solution} />
-          </details>
+          {selected.solution && (
+            <details className="quiz-solution">
+              <summary>
+                Дұрыс жауап пен шешім ·{" "}
+                {Array.isArray(selected.answer)
+                  ? selected.answer
+                      .map(
+                        (a, i) =>
+                          `${"rows" in selected && selected.rows.length ? `${i + 1}-` : ""}${"ABCDEF"[a]}`,
+                      )
+                      .join(", ")
+                  : "ABCDEF"[selected.answer]}
+              </summary>
+              <QuizText text={selected.solution} />
+            </details>
+          )}
           <div className="mt-4 flex flex-wrap gap-3">
             <Button
               variant="secondary"

@@ -55,7 +55,9 @@ export function cleanTex(text: string) {
     .replace(solutionsHeading, "")
     .replace(/\\(?:begin|end)\{(?:center|enumerate|document)\}/g, "")
     .replace(/\\textbf\{([^{}]*)\}/g, "$1")
-    .replace(/\\\\/g, "\n")
+    .replace(/\\(?:noindent|Large|large|small)\b/g, "")
+    .replace(/\\(?:textit|emph)\{([^{}]*)\}/g, "$1")
+    .replace(/\\\\(?:\[[^\]]*\])?/g, "\n")
     .trim();
 }
 
@@ -63,6 +65,11 @@ export function cleanTex(text: string) {
 export function importQuiz(source: string): QuizQuestion[] {
   if (!source.trim() || source.length > 250000)
     throw new Error("Код бос немесе тым үлкен (250 000 таңбаға дейін).");
+  let number = 0;
+  source = source.replace(
+    /\\question\b(?:\s*\[\d+\])?/g,
+    () => `\\qnum{${++number}}`,
+  );
   const boundary = source.search(solutionsHeading);
   if (boundary < 0)
     throw new Error(
