@@ -81,3 +81,13 @@ test("plots evaluate bounded arithmetic and reject executable text", () => {
   ])
     assert.throws(() => plotExpression(s));
 });
+test("math matrix and cases row separators survive TeX layout cleanup", () => {
+  const q =
+    parsePracticeQuestions(String.raw`\question $\begin{cases}x-y=4 \\ xy=12\end{cases}$
+A) 1 \\[0.15cm]
+B) 2
+C) 3
+D) 4`)[0];
+  assert.ok(q.prompt.includes(String.raw`4 \\ xy`));
+  assert.equal(q.options[0], "1");
+});

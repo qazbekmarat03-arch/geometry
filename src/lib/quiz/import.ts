@@ -57,7 +57,10 @@ export function cleanTex(text: string) {
     .replace(/\\textbf\{([^{}]*)\}/g, "$1")
     .replace(/\\(?:noindent|Large|large|small)\b/g, "")
     .replace(/\\(?:textit|emph)\{([^{}]*)\}/g, "$1")
-    .replace(/\\\\(?:\[[^\]]*\])?/g, "\n")
+    .replace(
+      /(\$\$[\s\S]*?\$\$|\$[^$]*\$)|\\\\(?:\[[^\]]*\])?/g,
+      (match, math) => math ?? "\n",
+    )
     .trim();
 }
 
