@@ -12,6 +12,7 @@ import {
   practiceSolutionTemplate,
   type PracticeQuestion,
 } from "@/lib/quiz/practice-import";
+import { MatchingTable } from "@/components/course/matching-table";
 import dynamic from "next/dynamic";
 const QuizText = dynamic(
   () => import("@/components/course/quiz-text").then((m) => m.QuizText),
@@ -304,24 +305,25 @@ export function QuizEditor({
             </select>
           </label>
           <QuizText text={selected.prompt} />
-          {"rows" in selected &&
-            selected.rows.map((row, i) => (
-              <div className="my-3" key={i}>
-                <span>{i + 1}) </span>
-                <QuizText text={row} />
-              </div>
-            ))}
-          <div className="quiz-options">
-            {selected.options.map((o, j) => (
-              <div
-                className="flex items-start gap-3 rounded-xl border border-white/15 p-3"
-                key={j}
-              >
-                <span>{"ABCDEF"[j]})</span>
-                <QuizText text={o} />
-              </div>
-            ))}
-          </div>
+          {"kind" in selected && selected.kind === "matching" ? (
+            <MatchingTable
+              key={previewIndex}
+              rows={selected.rows}
+              options={selected.options}
+            />
+          ) : (
+            <div className="quiz-options">
+              {selected.options.map((o, j) => (
+                <div
+                  className="flex items-start gap-3 rounded-xl border border-white/15 p-3"
+                  key={j}
+                >
+                  <span>{"ABCDEF"[j]})</span>
+                  <QuizText text={o} />
+                </div>
+              ))}
+            </div>
+          )}
           {selected.solution && (
             <details className="quiz-solution">
               <summary>

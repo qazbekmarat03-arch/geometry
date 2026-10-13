@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { PracticeView } from "@/lib/practice";
 import { submitPractice } from "@/app/practice/actions";
+import { MatchingTable } from "./matching-table";
 import { QuizText } from "./quiz-text";
 import { Button } from "@/components/ui/button";
 export function PracticeRunner({
@@ -132,75 +133,54 @@ export function PracticeRunner({
               ? "Бір немесе бірнеше дұрыс жауапты белгілеңіз."
               : "Бір дұрыс жауапты таңдаңыз."}
         </p>
-        {q.kind === "matching" &&
-          q.rows?.map((row, r) => (
-            <label
-              key={r}
-              className="my-4 block rounded-xl border border-line p-3"
-            >
-              <span>{r + 1})</span>
-              <QuizText text={row} />
-              <select
-                aria-label={`${r + 1}-жолдың жауабы`}
-                className="premium-input mt-2"
-                disabled={review || pending}
-                value={
-                  Array.isArray(answers[index])
-                    ? ((answers[index] as number[])[r] ?? -1)
-                    : -1
-                }
-                onChange={(e) => {
-                  const values = Array.isArray(answers[index])
-                    ? [...(answers[index] as number[])]
-                    : q.rows!.map(() => -1);
-                  values[r] = Number(e.target.value);
-                  update(values);
-                }}
+        {q.kind === "matching" && (
+          <MatchingTable
+            rows={q.rows ?? []}
+            options={q.options}
+            value={
+              Array.isArray(answers[index]) ? (answers[index] as number[]) : []
+            }
+            onChange={update}
+            disabled={review || pending}
+          />
+        )}
+        {q.kind !== "matching" && (
+          <fieldset className="my-5 space-y-3" disabled={review || pending}>
+            <legend className="sr-only">Жауапты таңдаңыз</legend>
+            {q.options.map((o, i) => (
+              <label
+                key={i}
+                className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line p-4"
               >
-                <option value={-1}>Таңдаңыз</option>
-                {q.options.map((_, i) => (
-                  <option key={i} value={i}>
-                    {"ABCDEF"[i]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        <fieldset className="my-5 space-y-3" disabled={review || pending}>
-          <legend className="sr-only">Жауапты таңдаңыз</legend>
-          {q.options.map((o, i) => (
-            <label
-              key={i}
-              className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line p-4"
-            >
-              {q.kind !== "matching" && (
-                <input
-                  type={q.kind === "multiple" ? "checkbox" : "radio"}
-                  name={`question-${index}`}
-                  checked={
-                    Array.isArray(answers[index])
-                      ? (answers[index] as number[]).includes(i)
-                      : answers[index] === i
-                  }
-                  onChange={() => {
-                    if (q.kind === "multiple") {
-                      const values = Array.isArray(answers[index])
-                        ? (answers[index] as number[])
-                        : [];
-                      update(
-                        values.includes(i)
-                          ? values.filter((v) => v !== i)
-                          : [...values, i].sort((a, b) => a - b),
-                      );
-                    } else update(i);
-                  }}
-                />
-              )}
-              <span>{"ABCDEF"[i]})</span>
-              <QuizText text={o} />
-            </label>
-          ))}
-        </fieldset>
+                {q.kind !== "matching" && (
+                  <input
+                    type={q.kind === "multiple" ? "checkbox" : "radio"}
+                    name={`question-${index}`}
+                    checked={
+                      Array.isArray(answers[index])
+                        ? (answers[index] as number[]).includes(i)
+                        : answers[index] === i
+                    }
+                    onChange={() => {
+                      if (q.kind === "multiple") {
+                        const values = Array.isArray(answers[index])
+                          ? (answers[index] as number[])
+                          : [];
+                        update(
+                          values.includes(i)
+                            ? values.filter((v) => v !== i)
+                            : [...values, i].sort((a, b) => a - b),
+                        );
+                      } else update(i);
+                    }}
+                  />
+                )}
+                <span>{"ABCDEF"[i]})</span>
+                <QuizText text={o} />
+              </label>
+            ))}
+          </fieldset>
+        )}
         {review && (
           <div className="rounded-2xl border border-brand p-5">
             <p className="mb-3 font-semibold">
