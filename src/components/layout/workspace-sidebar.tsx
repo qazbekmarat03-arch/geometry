@@ -18,6 +18,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { signOut } from "@/app/auth/actions";
 import { cn } from "@/lib/utils";
 const studentLinks = [
+  { href: "/dashboard/theory", title: "Теория жинағы", icon: BookOpen },
   { href: "/practice", title: "Нұсқа талдау", icon: BookOpen },
   { href: "/dashboard", title: "Басты бет", icon: House },
   { href: "/dashboard/courses", title: "Менің курстарым", icon: BookOpen },
@@ -29,6 +30,7 @@ const studentLinks = [
   { href: "/dashboard/profile", title: "Профиль", icon: UserRound },
 ];
 const adminLinks = [
+  { href: "/admin/theory", title: "Теория жинағы", icon: BookOpen },
   { href: "/admin/practice", title: "Нұсқа талдау", icon: BookOpen },
   { href: "/admin", title: "Басты бет", icon: House },
   { href: "/admin/students", title: "Оқушылар", icon: Users },

@@ -47,6 +47,13 @@ export function combineQuizSource(questions: string, solutions: string) {
 }
 
 export function cleanTex(text: string) {
+  text = text
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_, body) => "$$" + body + "$$")
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_, body) => "$" + body + "$");
+  const math: string[] = [];
+  text = text.replace(/\$\$[\s\S]*?\$\$|\$[^$]*\$|\\begin\{(?:align\*?|equation\*?|gather\*?)\}[\s\S]*?\\end\{(?:align\*?|equation\*?|gather\*?)\}/g, value => {
+    math.push(value); return "\uE000" + (math.length - 1) + "\uE001";
+  });
   return text
     .replace(/(?<!\\)%[^\n]*/g, "")
     .replace(/\\(?:vspace|hspace)\*?\{[^}]*\}/g, "")
@@ -61,7 +68,7 @@ export function cleanTex(text: string) {
       /(\$\$[\s\S]*?\$\$|\$[^$]*\$)|\\\\(?:\[[^\]]*\])?/g,
       (match, math) => math ?? "\n",
     )
-    .trim();
+    .trim().replace(/\uE000(\d+)\uE001/g, (_, index) => math[Number(index)] ?? "");
 }
 
 /** Parse a bounded, declarative question format. Never execute TeX commands. */

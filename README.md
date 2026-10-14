@@ -212,3 +212,9 @@ A–F бірнеше жауапты және `tabular` + `multirow` сәйкес
 дұрыс болуы керек. Бұл ресми ҰБТ-ның ішінара ұпай есептеу жүйесі емес.
 Сервер бағалайды; кілттер мен шешімдер тапсыруға дейін берілмейді.
 `20261013001500_practice_question_types.sql` миграциясын қолдану қажет.
+
+## Теория жинағы
+
+Apply `20261014001600_theory_topics.sql` before deploying theory pages. Admin: `/admin/theory`; student: `/dashboard/theory`. Topics belong to courses and require active, unexpired enrollment and publication. Admins can save drafts, edit, reorder by position and unpublish. Source is limited to 100,000 characters.
+
+TeX support is a safe browser renderer, not a TeXstudio/LaTeX compiler. Supported: inline and display math, equation/align, KaTeX matrices/cases, simple headings/emphasis/lists and the existing bounded TikZ subset. Arbitrary packages, macros, external files and shell commands are not executed. Unsupported prose commands remain visible with a warning; invalid math displays its source. Always preview before publishing. Quiz imports still require valid question options, answers and solutions; renderer support does not remove grading validation.

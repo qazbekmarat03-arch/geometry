@@ -1,0 +1,1 @@
+export default function Loading(){return <div role="status" aria-label="Жүктелуде..." className="space-y-5"><p className="text-muted">Жүктелуде...</p><div className="skeleton-surface h-14 rounded-xl"/><div className="skeleton-surface h-60 rounded-xl"/></div>}
