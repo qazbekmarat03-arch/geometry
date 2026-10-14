@@ -5,7 +5,6 @@ import {
   House,
   BookOpen,
   ChartNoAxesColumnIncreasing,
-  UserRound,
   Users,
   Play,
   KeyRound,
@@ -28,7 +27,6 @@ const studentLinks = [
     title: "Прогресс",
     icon: ChartNoAxesColumnIncreasing,
   },
-  { href: "/dashboard/profile", title: "Профиль", icon: UserRound },
 ];
 const adminLinks = [
   { href: "/admin", title: "Басты бет", icon: House },
