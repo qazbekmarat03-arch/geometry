@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>DURYSTAP</title>
+  <rect width="64" height="64" rx="14" fill="#06130e"/>
+  <circle cx="32" cy="15" r="7" fill="#fff"/>
+  <path d="M11 26Q11 22 15 24L27 32Q30 34 30 39V56L14 47Q11 45 11 42Z" fill="#087a51"/>
+  <path d="M34 39Q34 34 38 32L50 24Q54 22 54 27V43Q54 46 51 48L34 57Z" fill="#16c56c"/>
+  <path d="M40 39Q40 37 42 36L48 32V40Q48 43 45 44L40 47Z" fill="#06130e"/>
+</svg>
