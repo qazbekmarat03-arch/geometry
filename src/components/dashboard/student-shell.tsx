@@ -1,5 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import { Sun, Moon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { ReactNode } from "react";
 import { StudentSidebar } from "./sidebar";
@@ -44,6 +45,24 @@ export function StudentShell({
   children: ReactNode;
   admin?: boolean;
 }) {
+  const pathname = usePathname();
+  const section = pathname.includes("/theory")
+    ? "Теория жинағы"
+    : pathname.includes("/practice")
+      ? "Нұсқа талдау"
+      : pathname.includes("/courses")
+        ? "Курстар"
+        : pathname.includes("/students")
+          ? "Оқушылар"
+          : pathname.includes("/progress")
+            ? "Прогресс"
+            : pathname.includes("/profile")
+              ? "Профиль"
+              : pathname.includes("/lessons")
+                ? "Сабақтар"
+                : pathname.includes("/access")
+                  ? "Қолжетімділік"
+                  : "Басты бет";
   const [light, toggleLight] = usePreference("durystap-student-light");
   const [collapsed, toggleMenu] = usePreference(
     "durystap-student-menu-collapsed",
@@ -69,9 +88,12 @@ export function StudentShell({
             )}
             {collapsed ? "Мәзірді ашу" : "Мәзірді жинау"}
           </button>
-          <p className="hidden text-[11px] text-muted xl:block">
-            DURYSTAP <span className="mx-3 text-ink/20">/</span>{" "}
-            {admin ? "Басқару кеңістігі" : "Оқу кеңістігі"}
+          <p className="workspace-location text-sm text-muted">
+            <span className="workspace-location-label">
+              {admin ? "Басқару" : "Оқу кеңістігі"}
+            </span>
+            <span className="mx-3 text-ink/20">/</span>
+            <strong className="text-ink">{section}</strong>
           </p>
           <div className="flex items-center gap-3">
             <button
@@ -89,7 +111,9 @@ export function StudentShell({
           </div>
         </header>
         <main id="main" className="workspace-main">
-          {children}
+          <div key={pathname} className="workspace-route">
+            {children}
+          </div>
         </main>
       </div>
     </div>

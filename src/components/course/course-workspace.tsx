@@ -166,7 +166,7 @@ export function CourseWorkspace({
           </nav>
         </CurriculumPanel>
         {selected && homework ? (
-          <article className="min-w-0">
+          <article key={selected.id} className="lesson-content-enter min-w-0">
             <p className="eyebrow mb-4 text-brand">
               САБАҚ {String(index + 1).padStart(2, "0")}
             </p>

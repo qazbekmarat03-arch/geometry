@@ -17,10 +17,11 @@ import { MobileNavigation } from "./mobile-navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { signOut } from "@/app/auth/actions";
 import { cn } from "@/lib/utils";
+import { NavigationFeedback } from "./navigation-feedback";
 const studentLinks = [
+  { href: "/dashboard", title: "Басты бет", icon: House },
   { href: "/dashboard/theory", title: "Теория жинағы", icon: BookOpen },
   { href: "/practice", title: "Нұсқа талдау", icon: BookOpen },
-  { href: "/dashboard", title: "Басты бет", icon: House },
   { href: "/dashboard/courses", title: "Менің курстарым", icon: BookOpen },
   {
     href: "/dashboard/progress",
@@ -30,9 +31,9 @@ const studentLinks = [
   { href: "/dashboard/profile", title: "Профиль", icon: UserRound },
 ];
 const adminLinks = [
+  { href: "/admin", title: "Басты бет", icon: House },
   { href: "/admin/theory", title: "Теория жинағы", icon: BookOpen },
   { href: "/admin/practice", title: "Нұсқа талдау", icon: BookOpen },
-  { href: "/admin", title: "Басты бет", icon: House },
   { href: "/admin/students", title: "Оқушылар", icon: Users },
   { href: "/admin/courses", title: "Курстар", icon: BookOpen },
   { href: "/admin/lessons", title: "Сабақтар", icon: Play },
@@ -76,15 +77,18 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
+              aria-label={title}
+              title={title}
               className={cn(
                 "flex items-center gap-3.5",
                 !active && "text-muted",
               )}
             >
               <Icon size={17} strokeWidth={1.5} />
-              {title}
+              <span className="navigation-label">{title}</span>
+              <NavigationFeedback />
               {active && (
-                <span className="ml-auto size-1 rounded-full bg-lime" />
+                <span className="navigation-active ml-auto size-1 rounded-full bg-lime" />
               )}
             </Link>
           );

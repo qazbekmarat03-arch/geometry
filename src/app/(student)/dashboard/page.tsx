@@ -19,7 +19,7 @@ export default async function DashboardPage() {
         label="МЕНІҢ ОҚУ КЕҢІСТІГІМ / 01"
         title={
           <>
-            Қайта оралғаныңа қуаныштымыз,{" "}
+            Сәлем,{" "}
             <span className="text-brand">{name}.</span>
           </>
         }
