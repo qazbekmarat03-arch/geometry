@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import {
   House,
   BookOpen,
+  ClipboardList,
+  GraduationCap,
   ChartNoAxesColumnIncreasing,
   Users,
   Play,
@@ -20,8 +22,8 @@ import { NavigationFeedback } from "./navigation-feedback";
 const studentLinks = [
   { href: "/dashboard", title: "Басты бет", icon: House },
   { href: "/dashboard/theory", title: "Теория жинағы", icon: BookOpen },
-  { href: "/practice", title: "Нұсқа талдау", icon: BookOpen },
-  { href: "/dashboard/courses", title: "Менің курстарым", icon: BookOpen },
+  { href: "/practice", title: "Нұсқа талдау", icon: ClipboardList },
+  { href: "/dashboard/courses", title: "Менің курстарым", icon: GraduationCap },
   {
     href: "/dashboard/progress",
     title: "Прогресс",
@@ -31,9 +33,9 @@ const studentLinks = [
 const adminLinks = [
   { href: "/admin", title: "Басты бет", icon: House },
   { href: "/admin/theory", title: "Теория жинағы", icon: BookOpen },
-  { href: "/admin/practice", title: "Нұсқа талдау", icon: BookOpen },
+  { href: "/admin/practice", title: "Нұсқа талдау", icon: ClipboardList },
   { href: "/admin/students", title: "Оқушылар", icon: Users },
-  { href: "/admin/courses", title: "Курстар", icon: BookOpen },
+  { href: "/admin/courses", title: "Курстар", icon: GraduationCap },
   { href: "/admin/lessons", title: "Сабақтар", icon: Play },
   { href: "/admin/access", title: "Қолжетімділік", icon: KeyRound },
 ];
