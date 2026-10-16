@@ -13,9 +13,12 @@ export const getDashboardData = cache(async (courseId?: string) => {
   const supabase = await createClient();
   let accessQuery = supabase
     .from("course_access")
-    .select("course_id")
+    .select(
+      "course_id, courses!inner(id, title, description, thumbnail_url, lesson_unlock_mode, created_at)",
+    )
     .eq("user_id", user.id)
     .eq("is_active", true)
+    .eq("courses.is_published", true)
     .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
   if (courseId) accessQuery = accessQuery.eq("course_id", courseId);
   const [profileResult, accessResult, progressResult] = await Promise.all([
@@ -32,18 +35,18 @@ export const getDashboardData = cache(async (courseId?: string) => {
   ]);
   if (profileResult.error || accessResult.error || progressResult.error)
     throw new Error("Оқу деректерін жүктеу мүмкін болмады.");
-  const ids = accessResult.data.map((row) => row.course_id as string);
+  // Join through the user's grant under RLS: avoids a second courses round trip.
+  const grantedCourses = (
+    accessResult.data as unknown as {
+      courses: Omit<Course, "modules"> & { created_at: string };
+    }[]
+  )
+    .map((row) => row.courses)
+    .sort((a, b) => a.created_at.localeCompare(b.created_at));
   let courses: Course[] = [];
-  if (ids.length) {
-    const result = await supabase
-      .from("courses")
-      .select("id, title, description, thumbnail_url, lesson_unlock_mode")
-      .in("id", ids)
-      .eq("is_published", true)
-      .order("created_at", { ascending: true });
-    if (result.error) throw new Error("Курстарды жүктеу мүмкін болмады.");
+  if (grantedCourses.length) {
     courses = await Promise.all(
-      result.data.map(async (course) => {
+      grantedCourses.map(async (course) => {
         const outline = await supabase.rpc("get_course_curriculum", {
           target_course: course.id,
         });

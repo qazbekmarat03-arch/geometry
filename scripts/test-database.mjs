@@ -1389,6 +1389,7 @@ try {
       ('${id(801)}','Other course','Hidden',true);`);
   await asUser(student);
   await eq("select count(*)::integer from public.theory_topics",1,"only published enrolled theory visible");
+  await eq(`select count(*)::integer from public.course_access a join public.courses c on c.id=a.course_id where a.user_id='${student}' and c.id in ('${id(800)}','${id(801)}') and a.is_active and (a.expires_at is null or a.expires_at>now()) and c.is_published`,1,"dashboard join exposes only enrolled published courses");
   await denied(`insert into public.theory_topics(course_id,title,source) values('${id(800)}','Forged','x')`,"students cannot create theory");
   await db.exec("update public.theory_topics set source='Tampered'; delete from public.theory_topics");
   await eq("select source from public.theory_topics limit 1","Theory","students cannot edit/delete theory");
@@ -1396,6 +1397,7 @@ try {
   await db.exec(`update public.course_access set expires_at=now()-interval '1 second' where user_id='${student}'`);
   await asUser(student);
   await eq("select count(*)::integer from public.theory_topics",0,"expired access hides theory");
+  await eq(`select count(*)::integer from public.course_access a join public.courses c on c.id=a.course_id where a.user_id='${student}' and a.is_active and (a.expires_at is null or a.expires_at>now()) and c.is_published`,0,"dashboard join hides expired courses");
   await asOwner();
   await db.exec(`update public.course_access set expires_at=null,is_active=false where user_id='${student}'`);
   await asUser(student);

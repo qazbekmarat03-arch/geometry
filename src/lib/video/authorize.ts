@@ -55,19 +55,19 @@ export async function authorizeLessonResource(
     modules: { course_id: string };
   };
   // Course identity is derived from the database, not request parameters.
-  const grant = await supabase
-    .from("course_access")
-    .select("expires_at")
-    .eq("user_id", user.id)
-    .eq("course_id", row.modules.course_id)
-    .eq("is_active", true)
-    .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
-    .maybeSingle();
+  const [grant, unlocked] = await Promise.all([
+    supabase
+      .from("course_access")
+      .select("expires_at")
+      .eq("user_id", user.id)
+      .eq("course_id", row.modules.course_id)
+      .eq("is_active", true)
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+      .maybeSingle(),
+    supabase.rpc("can_access_lesson", { target_lesson: lessonId }),
+  ]);
   if (grant.error) throw new VideoAccessError(503);
   if (!grant.data) throw new VideoAccessError(403);
-  const unlocked = await supabase.rpc("can_access_lesson", {
-    target_lesson: lessonId,
-  });
   if (unlocked.error) throw new VideoAccessError(503);
   if (!unlocked.data) throw new VideoAccessError(403);
   return {

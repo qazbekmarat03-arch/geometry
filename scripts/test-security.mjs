@@ -62,3 +62,15 @@ test("Next configuration rejects public service credentials without printing the
     assert.equal(result.stderr.includes(key), false);
   }
 });
+
+test("browser security headers prevent framing and active object embeds", async () => {
+  const { default: config } = await import("../next.config.ts");
+  const rules = await config.headers();
+  const headers = Object.fromEntries(rules.find(r => r.source === "/:path*").headers.map(h => [h.key, h.value]));
+  assert.equal(config.poweredByHeader, false);
+  assert.equal(headers["X-Content-Type-Options"], "nosniff");
+  assert.equal(headers["X-Frame-Options"], "DENY");
+  assert.match(headers["Content-Security-Policy"], /frame-ancestors 'none'/);
+  assert.match(headers["Content-Security-Policy"], /object-src 'none'/);
+  assert.match(headers["Content-Security-Policy"], /base-uri 'self'/);
+});
