@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PracticeBadge } from "@/components/course/practice-badge";
 import { createClient } from "@/lib/supabase/server";
 import { PRACTICE_WHATSAPP } from "@/lib/practice";
 export const metadata = { title: "Нұсқа талдау" };
@@ -22,11 +23,9 @@ export default async function PracticeCatalog() {
         {data?.map((e) => (
           <article
             key={e.id}
-            className="rounded-3xl border border-line bg-surface p-6"
+            className={`practice-catalog-card rounded-3xl border border-line bg-surface p-6 ${e.is_free ? "practice-free" : ""}`}
           >
-            <span className="text-sm text-brand">
-              {e.is_free ? "Тегін" : "500 ₸ · талдауымен"}
-            </span>
+            <PracticeBadge title={e.title} free={e.is_free} />
             <h2 className="my-4 text-2xl">{e.title}</h2>
             <p className="mb-6 text-muted">{e.description}</p>
             <Link

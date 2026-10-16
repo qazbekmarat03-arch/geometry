@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PracticeBadge } from "@/components/course/practice-badge";
 import { createClient } from "@/lib/supabase/server";
 import { savePracticeMetadata } from "./actions";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -22,11 +23,11 @@ export default async function PracticeAdmin() {
           <Link
             key={e.id}
             href={"/admin/practice/" + e.id}
-            className="rounded-3xl border border-line p-6"
+            className={`practice-catalog-card rounded-3xl border border-line p-6 ${e.is_free ? "practice-free" : ""}`}
           >
-            <h2 className="text-xl">{e.title}</h2>
+            <PracticeBadge title={e.title} free={e.is_free} />
+            <h2 className="mt-4 text-xl">{e.title}</h2>
             <p className="mt-3 text-muted">
-              {e.is_free ? "Тегін" : "500 ₸ · талдауымен"} ·{" "}
               {e.is_published ? "Жарияланған" : "Жоба"}
             </p>
           </Link>
