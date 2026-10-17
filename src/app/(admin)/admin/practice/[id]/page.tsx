@@ -14,17 +14,23 @@ export default async function EditPractice({
   const { id } = await params;
   if (!validId(id)) notFound();
   const db = await createClient();
-  const [{ data: e, error }, { data: content }, { data: access }] =
-    await Promise.all([
-      db.from("practice_exams").select("*").eq("id", id).maybeSingle(),
-      db
-        .from("practice_content")
-        .select("source")
-        .eq("exam_id", id)
-        .maybeSingle(),
-      db.from("practice_access").select("profiles(email)").eq("exam_id", id),
-    ]);
-  if (error) throw new Error("Қате орын алды.");
+  const [
+    { data: e, error },
+    { data: content, error: contentError },
+    { data: access, error: accessError },
+  ] = await Promise.all([
+    db.from("practice_exams").select("*").eq("id", id).maybeSingle(),
+    db
+      .from("practice_content")
+      .select("source")
+      .eq("exam_id", id)
+      .maybeSingle(),
+    db.from("practice_access").select("profiles(email)").eq("exam_id", id),
+  ]);
+  if (error || contentError || accessError)
+    throw new Error(
+      "Қате орын алды. Нұсқа деректері толық жүктелмеді. Қайта көріңіз.",
+    );
   if (!e) notFound();
   const emails = (access ?? []).flatMap((a) => {
     const p = a.profiles as unknown as { email: string } | null;

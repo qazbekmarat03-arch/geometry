@@ -96,7 +96,10 @@ export function TheoryEditor({
         <textarea
           name="source"
           value={source}
-          onChange={(e) => setSource(e.target.value)}
+          onChange={(e) => {
+            setSource(e.target.value);
+            setPreview(null);
+          }}
           required
           maxLength={100000}
           rows={18}
@@ -113,6 +116,7 @@ export function TheoryEditor({
         <button
           type="button"
           className="premium-button button-secondary px-5 py-3"
+          disabled={pending || !source.trim()}
           onClick={() => setPreview(source)}
         >
           Алдын ала көру

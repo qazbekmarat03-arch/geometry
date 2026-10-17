@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   importQuiz,
   splitQuizSource,
@@ -42,7 +42,10 @@ export function QuizEditor({
   initialSource: string;
   practice?: boolean;
 }) {
-  const initial = splitQuizSource(initialSource);
+  const initial = useMemo(
+    () => splitQuizSource(initialSource),
+    [initialSource],
+  );
   const [mode, setMode] = useState(initialMode),
     [source, setSource] = useState(initial.questions),
     [solutions, setSolutions] = useState(initial.solutions),
@@ -51,20 +54,35 @@ export function QuizEditor({
     [error, setError] = useState(""),
     [pending, setPending] = useState(false);
   const toast = useToast();
+  const [showPdfCode, setShowPdfCode] = useState(false);
+  const signature = JSON.stringify([mode, source, solutions]);
+  const [savedSignature, setSavedSignature] = useState(signature);
+  const dirty = signature !== savedSignature;
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
   function inspect() {
     try {
       const combined = combineQuizSource(source, solutions);
-      setPreview(
-        practice
-          ? splitQuizSource(combined).solutions
-            ? importPractice(combined)
-            : parsePracticeQuestions(combined).map((q) => ({
-                ...q,
-                answer: -1,
-                solution: "",
-              }))
-          : importQuiz(combined),
-      );
+      if (splitQuizSource(combined).solutions) {
+        setPreview(practice ? importPractice(combined) : importQuiz(combined));
+      } else {
+        const questions = parsePracticeQuestions(combined);
+        if (
+          !practice &&
+          questions.some((q) => q.kind !== "single" || q.options.length !== 4)
+        )
+          throw new Error(
+            "Үй тапсырмасында төрт нұсқалы, бір дұрыс жауапты сұрақтар болсын.",
+          );
+        setPreview(questions.map((q) => ({ ...q, answer: -1, solution: "" })));
+      }
       setPreviewIndex(0);
       setError("");
     } catch (e) {
@@ -82,6 +100,7 @@ export function QuizEditor({
         combineQuizSource(source, solutions),
       );
       if (!result.ok) setError(result.message);
+      else setSavedSignature(signature);
       toast({ message: result.message, error: !result.ok });
     } catch (e) {
       setError(
@@ -144,128 +163,151 @@ export function QuizEditor({
           </p>
         </>
       )}
-      <ol className="my-5 list-decimal space-y-2 pl-5 text-sm text-muted">
-        {!practice && (
-          <li>Тапсырма түрін таңдаңыз: PDF, тест немесе екеуі бірге.</li>
-        )}
-        <li>
-          Сұрақтар мен шешімдердің кодын төмендегі бөлек өрістерге қойыңыз
-          немесе .tex / .txt файлдарын таңдаңыз.
-        </li>
-        <li>
-          «Алдын ала қарау» арқылы сұрақтар мен сызбаларды тексеріп, сақтаңыз.
-        </li>
-      </ol>
-      <details className="mb-4">
-        <summary className="cursor-pointer text-brand">
-          TeXstudio кодының үлгісі
-        </summary>
-        <pre className="overflow-auto p-3 text-xs">{example}</pre>
-        <p className="text-xs text-muted">
-          1–100 сұрақ. \question немесе \qnum&#123;1&#125;. Әрқайсысында A–D
-          жауаптары және жауаптар бөлімінде шешімі болсын. «Жауабы: B» шешімнің
-          басында да, соңында да жазыла алады; нүкте міндетті емес. $...$
-          формулалары, қарапайым TikZ: coordinate, draw, path, node, кесінділер
-          мен доғалар қолданылады. Толық TeX бағдарламасы орындалмайды.
-        </p>
-      </details>
-      <label className="mb-3 block text-sm">
-        Сұрақтар файлы (.tex / .txt)
-        <input
-          type="file"
-          accept=".tex,.txt"
-          disabled={pending}
-          className="mt-2 block w-full text-sm"
-          onChange={(e) => {
-            void loadFile(e.target.files?.[0], "questions");
-            e.target.value = "";
-          }}
-        />
-      </label>
-      <label className="block">
-        Сұрақтардың TeX коды
-        <textarea
-          className="premium-input mt-2 min-h-64 w-full font-mono text-xs"
-          value={source}
-          maxLength={250000}
-          onChange={(e) => {
-            setSource(e.target.value);
-            setPreview([]);
-          }}
-          disabled={pending}
-          spellCheck={false}
-        />
-      </label>
-      <p className="my-2 text-xs text-muted">
-        Бір файлда сұрақтар да, жауаптар да болса, файлдан жүктегенде автоматты
-        түрде бөлінеді. Толық кодты бірінші өріске де қоюға болады — екінші
-        өрісті бос қалдырыңыз.
-      </p>
-      {practice && (
-        <div className="my-5 rounded-2xl border border-line p-4 text-sm">
-          <p>
-            Нұсқада: A–D — бір жауап; A–F — бірнеше жауап; tabular / multirow —
-            сәйкестендіру. Сұрақтарды шешімсіз алдын ала көруге болады, бірақ
-            сақтау үшін жауап кілті мен толық шешімі қажет.
-          </p>
-          <p className="mt-2">
-            Шешімдерді ретімен жазыңыз: \qnum&#123;1&#125;, жеке жолда «Жауабы:
-            B», «Жауабы: A, C, E» немесе «Жауабы: 1-B, 2-C», келесі жолда толық
-            шығару жолы. Оқушы аяқтағаннан кейін қателерін талдай алады.
-          </p>
-          <Button
-            className="mt-3"
-            variant="secondary"
-            disabled={pending || !!solutions.trim()}
-            onClick={() => {
-              try {
-                setSolutions(practiceSolutionTemplate(source));
-                setError("");
-              } catch (e) {
-                setError(e instanceof Error ? e.message : "Код дұрыс емес.");
-              }
-            }}
-          >
-            Шешімдер үлгісін жасау
-          </Button>
-        </div>
+      {!practice && mode === "pdf" && (
+        <Button
+          variant="ghost"
+          className="my-3"
+          onClick={() => setShowPdfCode(!showPdfCode)}
+        >
+          {showPdfCode
+            ? "Тест кодын жинау"
+            : "Сақталған тест кодын қарау / өзгерту"}
+        </Button>
       )}
-      <label className="mb-3 mt-5 block text-sm">
-        Шешімдер файлы (.tex / .txt)
-        <input
-          type="file"
-          accept=".tex,.txt"
-          disabled={pending}
-          className="mt-2 block w-full text-sm"
-          onChange={(e) => {
-            void loadFile(e.target.files?.[0], "solutions");
-            e.target.value = "";
-          }}
-        />
-      </label>
-      <label className="block">
-        Жауаптар мен шешімдердің TeX коды
-        <textarea
-          className="premium-input mt-2 min-h-48 w-full font-mono text-xs"
-          value={solutions}
-          maxLength={250000}
-          onChange={(e) => {
-            setSolutions(e.target.value);
-            setPreview([]);
-          }}
-          disabled={pending}
-          spellCheck={false}
-        />
-      </label>
+      <div
+        hidden={!practice && mode === "pdf" && !showPdfCode}
+        className="quiz-authoring-fields"
+      >
+        <ol className="my-5 list-decimal space-y-2 pl-5 text-sm text-muted">
+          {!practice && (
+            <li>Тапсырма түрін таңдаңыз: PDF, тест немесе екеуі бірге.</li>
+          )}
+          <li>
+            Сұрақтар мен шешімдердің кодын төмендегі бөлек өрістерге қойыңыз
+            немесе .tex / .txt файлдарын таңдаңыз.
+          </li>
+          <li>
+            «Алдын ала қарау» арқылы сұрақтар мен сызбаларды тексеріп, сақтаңыз.
+          </li>
+        </ol>
+        <details className="mb-4">
+          <summary className="cursor-pointer text-brand">
+            TeXstudio кодының үлгісі
+          </summary>
+          <p className="mb-3 text-sm text-muted">
+            Толық .tex құжаты, Markdown ішіндегі TeX, choices/oneparchoices, A),
+            A. және (A) жауаптары қабылданады. Дұрыс жауап пен шешімді бөлек
+            енгізіңіз: CorrectChoice белгісі жалғыз өзі жеткіліксіз.
+          </p>
+          <pre className="overflow-auto p-3 text-xs">{example}</pre>
+          <p className="text-xs text-muted">
+            1–100 сұрақ. \question немесе \qnum&#123;1&#125;. Әрқайсысында A–D
+            жауаптары және жауаптар бөлімінде шешімі болсын. «Жауабы: B»
+            шешімнің басында да, соңында да жазыла алады; нүкте міндетті емес.
+            $...$ формулалары, қарапайым TikZ: coordinate, draw, path, node,
+            кесінділер мен доғалар қолданылады. Толық TeX бағдарламасы
+            орындалмайды.
+          </p>
+        </details>
+        <label className="mb-3 block text-sm">
+          Сұрақтар файлы (.tex / .txt)
+          <input
+            type="file"
+            accept=".tex,.txt"
+            disabled={pending}
+            className="mt-2 block w-full text-sm"
+            onChange={(e) => {
+              void loadFile(e.target.files?.[0], "questions");
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <label className="block">
+          Сұрақтардың TeX коды
+          <textarea
+            className="premium-input mt-2 min-h-64 w-full font-mono text-xs"
+            value={source}
+            maxLength={250000}
+            onChange={(e) => {
+              setSource(e.target.value);
+              setPreview([]);
+            }}
+            disabled={pending}
+            spellCheck={false}
+          />
+        </label>
+        <p className="my-2 text-xs text-muted">
+          Бір файлда сұрақтар да, жауаптар да болса, файлдан жүктегенде
+          автоматты түрде бөлінеді. Толық кодты бірінші өріске де қоюға болады —
+          екінші өрісті бос қалдырыңыз.
+        </p>
+        {
+          <div className="my-5 rounded-2xl border border-line p-4 text-sm">
+            <p>
+              Нұсқада: A–D — бір жауап; A–F — бірнеше жауап; tabular / multirow
+              — сәйкестендіру. Сұрақтарды шешімсіз алдын ала көруге болады,
+              бірақ сақтау үшін жауап кілті мен толық шешімі қажет.
+            </p>
+            <p className="mt-2">
+              Шешімдерді ретімен жазыңыз: \qnum&#123;1&#125;, жеке жолда
+              «Жауабы: B», «Жауабы: A, C, E» немесе «Жауабы: 1-B, 2-C», келесі
+              жолда толық шығару жолы. Оқушы аяқтағаннан кейін қателерін талдай
+              алады.
+            </p>
+            <Button
+              className="mt-3"
+              variant="secondary"
+              disabled={pending || !!solutions.trim()}
+              onClick={() => {
+                try {
+                  setSolutions(practiceSolutionTemplate(source));
+                  setError("");
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "Код дұрыс емес.");
+                }
+              }}
+            >
+              Шешімдер үлгісін жасау
+            </Button>
+          </div>
+        }
+        <label className="mb-3 mt-5 block text-sm">
+          Шешімдер файлы (.tex / .txt)
+          <input
+            type="file"
+            accept=".tex,.txt"
+            disabled={pending}
+            className="mt-2 block w-full text-sm"
+            onChange={(e) => {
+              void loadFile(e.target.files?.[0], "solutions");
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <label className="block">
+          Жауаптар мен шешімдердің TeX коды
+          <textarea
+            className="premium-input mt-2 min-h-48 w-full font-mono text-xs"
+            value={solutions}
+            maxLength={250000}
+            onChange={(e) => {
+              setSolutions(e.target.value);
+              setPreview([]);
+            }}
+            disabled={pending}
+            spellCheck={false}
+          />
+        </label>
+      </div>
       {error && (
-        <p role="alert" className="my-3 text-red-300">
+        <p role="alert" className="editor-error my-3">
           {error}
         </p>
       )}
-      <div className="my-4 flex flex-wrap gap-3">
+      <div className="editor-toolbar my-4 flex flex-wrap items-center gap-3">
         <Button
           variant="secondary"
-          disabled={pending || !source.trim()}
+          disabled={pending || !source.trim() || (!practice && mode === "pdf")}
           onClick={inspect}
         >
           Алдын ала қарау
@@ -277,11 +319,20 @@ export function QuizEditor({
               ? "Нұсқа тапсырмаларын сақтау"
               : "Тапсырма түрін және тестті сақтау"}
         </Button>
+        <span role="status" className="text-xs text-muted">
+          {dirty ? "Сақталмаған өзгерістер бар" : "Өзгерістер сақталған"}
+        </span>
       </div>
-      {selected && (
+      {selected && (practice || mode !== "pdf") && (
         <div className="quiz-preview">
           <p className="mb-4" role="status">
             {preview.length} сұрақ
+            {!selected.solution && (
+              <span className="block text-sm text-muted">
+                Бұл — сұрақтардың алдын ала көрінісі. Сақтау үшін жауап пен
+                шешімін қосыңыз.
+              </span>
+            )}
             {!practice && (
               <>
                 {" "}
@@ -315,7 +366,7 @@ export function QuizEditor({
             <div className="quiz-options">
               {selected.options.map((o, j) => (
                 <div
-                  className="flex items-start gap-3 rounded-xl border border-white/15 p-3"
+                  className="flex items-start gap-3 rounded-xl border border-line p-3"
                   key={j}
                 >
                   <span>{"ABCDEF"[j]})</span>

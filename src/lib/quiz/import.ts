@@ -1,4 +1,5 @@
 import { parseDiagram } from "./diagram.ts";
+import { normalizeQuizSource } from "./normalize-source.ts";
 export type QuizQuestion = {
   prompt: string;
   options: string[];
@@ -34,6 +35,8 @@ export function splitQuizSource(source: string) {
       };
 }
 export function combineQuizSource(questions: string, solutions: string) {
+  questions = normalizeQuizSource(questions);
+  solutions = normalizeQuizSource(solutions);
   if (!solutions.trim()) return questions;
   if (questions.search(solutionsHeading) >= 0)
     throw new Error(
@@ -51,9 +54,13 @@ export function cleanTex(text: string) {
     .replace(/\\\[([\s\S]*?)\\\]/g, (_, body) => "$$" + body + "$$")
     .replace(/\\\(([\s\S]*?)\\\)/g, (_, body) => "$" + body + "$");
   const math: string[] = [];
-  text = text.replace(/\$\$[\s\S]*?\$\$|\$[^$]*\$|\\begin\{(?:align\*?|equation\*?|gather\*?)\}[\s\S]*?\\end\{(?:align\*?|equation\*?|gather\*?)\}/g, value => {
-    math.push(value); return "\uE000" + (math.length - 1) + "\uE001";
-  });
+  text = text.replace(
+    /\$\$[\s\S]*?\$\$|\$[^$]*\$|\\begin\{(?:align\*?|equation\*?|gather\*?)\}[\s\S]*?\\end\{(?:align\*?|equation\*?|gather\*?)\}/g,
+    (value) => {
+      math.push(value);
+      return "\uE000" + (math.length - 1) + "\uE001";
+    },
+  );
   return text
     .replace(/(?<!\\)%[^\n]*/g, "")
     .replace(/\\(?:vspace|hspace)\*?\{[^}]*\}/g, "")
@@ -68,11 +75,13 @@ export function cleanTex(text: string) {
       /(\$\$[\s\S]*?\$\$|\$[^$]*\$)|\\\\(?:\[[^\]]*\])?/g,
       (match, math) => math ?? "\n",
     )
-    .trim().replace(/\uE000(\d+)\uE001/g, (_, index) => math[Number(index)] ?? "");
+    .trim()
+    .replace(/\uE000(\d+)\uE001/g, (_, index) => math[Number(index)] ?? "");
 }
 
 /** Parse a bounded, declarative question format. Never execute TeX commands. */
 export function importQuiz(source: string): QuizQuestion[] {
+  source = normalizeQuizSource(source);
   if (!source.trim() || source.length > 250000)
     throw new Error("Код бос немесе тым үлкен (250 000 таңбаға дейін).");
   let number = 0;

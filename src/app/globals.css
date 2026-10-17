@@ -1150,3 +1150,28 @@ body { color-scheme: dark; }
 .practice-access-badge { display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:999px; background:var(--surface-inset); color:var(--ui-muted); font-size:12px; font-weight:600; }
 .practice-access-badge.is-free { background:var(--ui-brand); color:var(--surface-base); }
 .academy-workspace.workspace-light .practice-access-badge.is-free { color:white; }
+/* Consistent authoring and review surfaces in both workspace themes. */
+.academy-workspace .quiz-editor { min-width:0; padding:clamp(18px,3vw,30px); border:1px solid var(--ui-line); border-radius:20px; background:var(--surface-raised); }
+.academy-workspace .quiz-authoring-fields > label { margin-top:22px; font-size:14px; font-weight:600; }
+.academy-workspace .quiz-editor textarea { font-size:13px; line-height:1.8; tab-size:2; padding:18px; resize:vertical; border:1px solid var(--ui-line); }
+.academy-workspace input[type=file] { padding:10px; font-weight:400; overflow:hidden; }
+.academy-workspace input[type=file]::file-selector-button { padding:9px 12px; margin-right:12px; border:1px solid var(--ui-line); border-radius:8px; background:var(--surface-inset); color:var(--ui-ink); cursor:pointer; }
+.academy-workspace .editor-toolbar { position:sticky; bottom:12px; z-index:10; padding:14px; border:1px solid var(--ui-line); border-radius:14px; background:var(--surface-raised); box-shadow:0 8px 24px #0002; }
+.academy-workspace .quiz-preview { max-height:none; padding:clamp(16px,3vw,28px); background:var(--surface-base); border-radius:16px; overflow-wrap:anywhere; }
+.academy-workspace .quiz-preview .quiz-options > div { background:var(--surface-raised); min-width:0; }
+.academy-workspace .quiz-preview .quiz-options .quiz-text { min-width:0; flex:1; }
+.academy-workspace .editor-error { padding:14px 16px; border:1px solid #fb718566; border-radius:12px; background:#fb718514; color:#fda4af; font-size:14px; }
+.academy-workspace.workspace-light .editor-error { color:#a61b35; background:#fff0f1; }
+.academy-workspace .quiz-editor details > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; }
+@media(max-width:640px) {
+ .academy-workspace .editor-toolbar { position:static; }
+ .academy-workspace .editor-toolbar button { width:100%; }
+ .academy-workspace .quiz-preview select { display:block; width:100%; margin:8px 0 0; }
+ .academy-workspace .quiz-editor textarea { font-size:16px; }
+}
+/* Shared input sizing was missing on practice metadata/access forms. */
+.academy-workspace .premium-input { box-sizing:border-box; min-height:48px; border:1px solid var(--ui-line); padding:12px 14px; line-height:1.5; font-size:14px; }
+.academy-workspace textarea.premium-input { min-height:112px; resize:vertical; }
+.academy-workspace .premium-input::placeholder { color:var(--ui-muted); opacity:.8; }
+.academy-workspace input:is([type=checkbox],[type=radio]) { accent-color:var(--ui-brand-dark); }
+@media(max-width:640px) { .academy-workspace .premium-input { font-size:16px; } }

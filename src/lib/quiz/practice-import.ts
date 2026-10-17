@@ -1,5 +1,6 @@
 import { cleanTex, splitQuizSource } from "./import.ts";
 import { parseDiagram } from "./diagram.ts";
+import { normalizeQuizSource } from "./normalize-source.ts";
 
 export type PracticeQuestion = {
   prompt: string;
@@ -53,6 +54,7 @@ function parts(text: string) {
   });
 }
 export function parsePracticeQuestions(source: string): Draft[] {
+  source = normalizeQuizSource(source);
   if (!source.trim() || source.length > 250000)
     throw new Error("Код бос немесе 250 000 таңбадан көп.");
   let text = splitQuizSource(source).questions.replace(/(?<!\\)%[^\n]*/g, "");
@@ -179,6 +181,7 @@ export function practiceSolutionTemplate(source: string) {
     .join("\n\n");
 }
 export function importPractice(source: string): PracticeQuestion[] {
+  source = normalizeQuizSource(source);
   const draft = parsePracticeQuestions(source);
   const { solutions } = splitQuizSource(source);
   if (!solutions)
