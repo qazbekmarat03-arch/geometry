@@ -49,10 +49,11 @@ export function WorkspaceSidebar({ admin = false }: { admin?: boolean }) {
     >
       <MobileNavigation
         links={links.map(({ href, title }) => ({ href, title }))}
+        homeHref={admin ? "/admin" : "/dashboard"}
         signedIn
       />
       <div className="hidden px-7 pb-12 pt-9 lg:block">
-        <Logo />
+        <Logo href={admin ? "/admin" : "/dashboard"} />
       </div>
       <div className="mb-5 hidden items-center gap-2 px-8 lg:flex">
         <span className="size-1 rounded-full bg-brand" />

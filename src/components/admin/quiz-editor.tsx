@@ -22,6 +22,7 @@ import { saveHomeworkMode } from "@/app/(admin)/admin/courses/quiz-actions";
 import { savePracticeQuiz } from "@/app/(admin)/admin/practice/actions";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { CodeExample } from "./code-example";
 const example = String.raw`\qnum{1} Сыбайлас бұрыштардың қосындысы?
 A) $90^\circ$ \\
 B) $180^\circ$ \\
@@ -199,7 +200,19 @@ export function QuizEditor({
             A. және (A) жауаптары қабылданады. Дұрыс жауап пен шешімді бөлек
             енгізіңіз: CorrectChoice белгісі жалғыз өзі жеткіліксіз.
           </p>
-          <pre className="overflow-auto p-3 text-xs">{example}</pre>
+          <p className="mt-3 text-sm text-muted">
+            Бірінші үлгіні сұрақтар өрісіне, екіншісін шешімдер өрісіне
+            көшіріңіз. Мәтін мен сандарды өз тапсырмаңызға ауыстырыңыз. Үлгіні
+            көшіру сақталған тапсырмаларды өзгертпейді.
+          </p>
+          <CodeExample
+            title="Сұрақ кодының үлгісі"
+            code={splitQuizSource(example).questions}
+          />
+          <CodeExample
+            title="Жауап пен шешім кодының үлгісі"
+            code={splitQuizSource(example).solutions}
+          />
           <p className="text-xs text-muted">
             1–100 сұрақ. \question немесе \qnum&#123;1&#125;. Әрқайсысында A–D
             жауаптары және жауаптар бөлімінде шешімі болсын. «Жауабы: B»

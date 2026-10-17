@@ -13,9 +13,11 @@ export function MobileNavigation({
   links,
   signedIn = false,
   breakpoint = "lg",
+  homeHref = signedIn ? "/dashboard" : "/",
 }: {
   links: { href: string; title: string }[];
   signedIn?: boolean;
+  homeHref?: string;
   breakpoint?: "md" | "lg";
 }) {
   const [open, setOpen] = useState(false);
@@ -37,7 +39,7 @@ export function MobileNavigation({
         breakpoint === "md" ? "md:hidden" : "lg:hidden",
       )}
     >
-      <Logo />
+      <Logo href={homeHref} />
       <div className="flex items-center gap-2">
         {!signedIn && (
           <ButtonLink href="/login" variant="secondary" className="px-3">
@@ -63,7 +65,8 @@ export function MobileNavigation({
               (pathname === link.href ||
                 (index !== 0 && pathname.startsWith(`${link.href}/`)));
             return (
-              <Link prefetch={signedIn ? false : undefined}
+              <Link
+                prefetch={signedIn ? false : undefined}
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}

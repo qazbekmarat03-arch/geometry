@@ -4,6 +4,26 @@ import { useRouter } from "next/navigation";
 import { saveTheory } from "@/app/(admin)/admin/theory/actions";
 import { QuizText } from "@/components/course/quiz-text";
 import { useToast } from "@/components/ui/toast";
+import { CodeExample } from "./code-example";
+const theoryExample = String.raw`\section{Үшбұрыштың ауданы}
+\textbf{Ереже.} Үшбұрыштың ауданы табаны мен сол табанға түсірілген биіктігінің көбейтіндісінің жартысына тең.
+\[
+S = \frac{a \cdot h}{2}
+\]
+Мұндағы $a$ — табан, $h$ — осы табанға түсірілген биіктік.
+
+\subsection{Мысал}
+Табаны $12$ см, биіктігі $5$ см. Ауданын табыңыз.
+\[
+S = \frac{12 \cdot 5}{2} = 30\text{ см}^2
+\]
+\textbf{Жауабы:} $30$ см$^2$.
+
+\subsection{Есте сақтаңыз}
+\begin{itemize}
+\item Биіктік таңдалған табанға перпендикуляр түсіріледі.
+\item Аудан квадрат бірліктермен өлшенеді.
+\end{itemize}`;
 type Topic = {
   id: string;
   course_id: string;
@@ -91,6 +111,17 @@ export function TheoryEditor({
         />
         Оқушыларға жариялау
       </label>
+      <details className="rounded-2xl border border-line p-4">
+        <summary className="cursor-pointer text-brand">
+          Теория кодының үлгісі
+        </summary>
+        <p className="mt-3 text-sm text-muted">
+          Кодты көшіріп, төмендегі теория өрісіне қойыңыз. Тақырыпты,
+          түсіндірмені және формулаларды өзіңізге сай өзгертіп, алдын ала
+          көріңіз. Көшіру сақталған мәтінді өзгертпейді.
+        </p>
+        <CodeExample title="Теорияның дайын TeX үлгісі" code={theoryExample} />
+      </details>
       <label className="block">
         Теорияның TeX коды
         <textarea
