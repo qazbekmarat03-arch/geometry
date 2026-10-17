@@ -50,7 +50,7 @@ export function MatchingTable({
                 <span className="mb-2 block font-semibold text-brand">
                   {r + 1})
                 </span>
-                <div className="min-w-0 overflow-x-auto">
+                <div className="min-w-0 overflow-x-auto overflow-y-hidden py-2">
                   <QuizText text={row} />
                 </div>
               </th>
@@ -73,7 +73,7 @@ export function MatchingTable({
                       <span className="shrink-0 font-semibold">
                         {"ABCDEF"[i]})
                       </span>
-                      <div className="min-w-0 overflow-x-auto">
+                      <div className="min-w-0 overflow-x-auto overflow-y-hidden py-2">
                         <QuizText text={option} />
                       </div>
                     </label>
